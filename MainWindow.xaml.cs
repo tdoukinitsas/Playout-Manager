@@ -520,13 +520,16 @@ namespace Playout_Manager
             else { }
 
 
-
+            
+            
             string cgName = add_TemplateList.SelectedItem.ToString();
             string cgf0 = add_CGf0.Text;
             string cgf1 = add_CGf1.Text;
             int cgLayer = Convert.ToInt32(add_CGlayer.Text);
             int cgDelay = Convert.ToInt32(add_CGdelayInSeconds.Text);
             string command = add_commands.Text;
+            
+            
 
             AddItem(StartTime, ClipName, FrameIn, Framerate, EndAction, FrameDur, cgName, cgLayer, cgDelay, cgf0, cgf1, command);
         }
@@ -547,7 +550,7 @@ namespace Playout_Manager
 
             foreach (var item in MainGrid.Items.OfType<DataItem>())
             {
-                string itemEncoded = item.StartTime + "," + item.Name + "," + item.FrameIn + "," + item.Framerate + "," + item.EndAction + "," + item.Duration + "," + item.CG + "," + item.CGlayer + "," + item.CGdelay+ "," +item.CGfield0 + "," + item.CGfield1 + "," + item.Command;
+                string itemEncoded = item.StartTime + "," + item.Name + "," + item.FrameIn + "," + item.Framerate + "," + item.EndAction + "," + item.Duration + "," + item.CG + "," + item.CGlayer + "," + item.CGdelay + "," + item.CGfield0 + "," + item.CGfield1 + "," + item.Command;
                 stringBuilder = stringBuilder + itemEncoded + "¬";
             }
 
@@ -560,10 +563,11 @@ namespace Playout_Manager
             String[] line = encodedString.Split('¬');
             foreach (string item in line)
             {
-                if (item != "") { 
-                string[] property = item.Split(',');
-                AddItem(DateTime.Parse(property[0]), property[1], Convert.ToInt32(property[2]), Convert.ToInt32(property[3]), property[4], Convert.ToInt32(property[5]), property[6], Convert.ToInt32(property[7]), Convert.ToInt32(property[8]), property[9], property[10], property[11]);
-            }
+                if (item != "")
+                {
+                    string[] property = item.Split(',');
+                    AddItem(DateTime.Parse(property[0]), property[1], Convert.ToInt32(property[2]), Convert.ToInt32(property[3]), property[4], Convert.ToInt32(property[5]), property[6], Convert.ToInt32(property[7]), Convert.ToInt32(property[8]), property[9], property[10], property[11]);
+                }
             }
         }
 
@@ -578,21 +582,89 @@ namespace Playout_Manager
                 StringToDataGrid(loadString);
             }
 
-            
+
 
 
         }
 
         public void PlayItem(string Name, int frameIn, int framerate, string endaction, int duration, string CG, int cgLayer, int cgDelay, string CGf0, string CGf1, string Command)
         {
+            string loopCommand = "";
+            if (endaction == "loop") { loopCommand = " LOOP"; }
 
-            //This calculates if the clip framerate is different to our caspar channel framerate.
-            double playoutFramerate = GetPlayoutFramerate();
-            double frameRatio = 1 / (Convert.ToDouble(add_f_framerate.Content) / playoutFramerate);
+            //check if there's media
+            if (Name != "")
+            {
 
-            //Sends all our commands to CasparCG to play the media and the CG
-            _Caspar.Execute("LOAD 1-10 " + Name + "SEEK " + (frameIn*frameRatio) + "LENGTH " + (duration*frameRatio) );
-            _Caspar.Execute("PLAY");
+                //This calculates if the clip framerate is different to our caspar channel framerate.
+                double playoutFramerate = GetPlayoutFramerate();
+                double frameRatio = 1 / (Convert.ToDouble(framerate) / playoutFramerate);
+
+                try
+                {
+                    //Sends all our commands to CasparCG to play the media
+                    _Caspar.Execute("STOP 1-10");
+                    _Caspar.Execute("LOAD 1-10 " + Name + "" + loopCommand + " SEEK " + Convert.ToInt32((frameIn * frameRatio)) + " LENGTH " + Convert.ToInt32((duration * frameRatio)));
+                    _Caspar.Execute("PLAY 1-10");
+                }
+                catch (Exception playErr)
+                { Log(playErr.Message); }
+
+            }
+
+            //check if there's a CG
+            if (CG != "")
+            {
+                //Play the CG
+                CasparCG.Retard cgDelayRetard = new CasparCG.Retard(Convert.ToInt32(cgDelay));
+                int cgChannel = GetChannel("cg");
+
+                Template previewTemplate = new CasparObjects.Template();
+                previewTemplate.AddField("f0", CGf0);
+                previewTemplate.AddField("f1", CGf1);
+                previewTemplate.UseJSON = true;
+
+                try
+                {
+                    _Caspar.CG_Add(cgChannel, cgLayer, CG, previewTemplate, true, cgDelayRetard);
+                }
+                catch (Exception cgErr)
+                { Log(cgErr.Message); }
+
+            }
+
+            //lastly execute the Custom AMCP command
+            if (Command != null)
+            {
+                _Caspar.Execute(Command);
+            }
+        }
+
+        private void PlaySelected_Click(object sender, RoutedEventArgs e)
+        {
+            DataItem playItem = MainGrid.SelectedItem as DataItem;
+
+            PlayItem(playItem.Name, playItem.FrameIn, playItem.Framerate, playItem.EndAction, playItem.Duration, playItem.CG, playItem.CGlayer, playItem.CGdelay, playItem.CGfield0, playItem.CGfield1, playItem.Command);
+        }
+
+        private void CommandCGStop_Click(object sender, RoutedEventArgs e)
+        {
+            add_commands.Text = "CG 1-20 STOP";
+        }
+
+        private void CommandCGClear_Click(object sender, RoutedEventArgs e)
+        {
+            add_commands.Text = "CG 1-20 CLEAR";
+        }
+
+        private void CommandCGUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            add_commands.Text = "CG 1-20 UPDATE 1 ";
+        }
+
+        private void CommandMixerVolume_Click(object sender, RoutedEventArgs e)
+        {
+            add_commands.Text = "CG 1-20 UPDATE 1 ";
         }
     }
 }

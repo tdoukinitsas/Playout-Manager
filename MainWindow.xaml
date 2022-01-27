@@ -269,12 +269,41 @@
 
 								<Label Content="Additional Commands" Margin="0,20,0,0"/>
 								<TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" x:Name="add_commands" materialDesign:HintAssist.Hint="Extra AMCP Commands" Margin="10"/>
+                                <materialDesign:Card>
+                                    <StackPanel Orientation="Horizontal"
+                                                Margin="10">
+                                        <Label Content="Useful Commands:" />
+                                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                                Content="CG STOP"
+                                                x:Name="CommandCGStop"
+                                                Click="CommandCGStop_Click" />
+                                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                                Content="CG CLEAR"
+                                                x:Name="CommandCGClear"
+                                                Click="CommandCGClear_Click" />
+                                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                                Content="CG UPDATE"
+                                                x:Name="CommandCGUpdate"
+                                                Click="CommandCGUpdate_Click" />
+                                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                                Content="MIXER VOLUME"
+                                                x:Name="CommandMixerVolume"
+                                                Click="CommandMixerVolume_Click" />
+                                    </StackPanel>
+                                </materialDesign:Card>
 
-								<Grid>
+
+
+
+
+
+
+                                <Grid>
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition></ColumnDefinition>
 										<ColumnDefinition></ColumnDefinition>
 									</Grid.ColumnDefinitions>
+                                    
 									<Button
 		  
 		  HorizontalAlignment="Right"
@@ -298,7 +327,8 @@
 				
 	Style="{DynamicResource MaterialDesignToolBar}"
 	ClipToBounds="False" x:Name="toolbar_transportcontrols" HorizontalAlignment="Center" Visibility="Collapsed">
-					<Button Content="{materialDesign:PackIcon Kind=Play}" Foreground="#FF8BC34A" ToolTip="Play" />
+					<Button Content="{materialDesign:PackIcon Kind=Play}" Foreground="#FF8BC34A" ToolTip="Play" x:Name="PlaySelected"
+                            Click="PlaySelected_Click" />
 					<Button Content="{materialDesign:PackIcon Kind=Stopwatch}" Foreground="#FF8BC34A" ToolTip="Shedule" />
 					<Button Content="{materialDesign:PackIcon Kind=Pause}" ToolTip="Pause"/>
 					<Button Content="{materialDesign:PackIcon Kind=Stop}" ToolTip="Stop"/>
