@@ -18,6 +18,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CasparObjects;
+using System.IO;
+using Microsoft.Win32;
+
+
+
 
 namespace Playout_Manager
 {
@@ -110,7 +115,7 @@ namespace Playout_Manager
         public void AddItem(DateTime startTime, string Name, int frameIn, int framerate, string endaction, int duration, string CG, int cgLayer, int cgDelay, string CGf0, string CGf1, string Command)
         {
             //This is where we'll calculate the durations and add the item to our list
-            MainGrid.Items.Add(new DataItem { StartTime=startTime, Name = Name, FrameIn = frameIn, Framerate=framerate, EndAction=endaction, Duration=duration,CG=CG,CGlayer=cgLayer,CGdelay=cgDelay,CGfield0=CGf0,CGfield1=CGf1,Command=Command });
+            MainGrid.Items.Add(new DataItem { StartTime = startTime, Name = Name, FrameIn = frameIn, Framerate = framerate, EndAction = endaction, Duration = duration, CG = CG, CGlayer = cgLayer, CGdelay = cgDelay, CGfield0 = CGf0, CGfield1 = CGf1, Command = Command });
         }
 
         public void GetChannels()
@@ -500,8 +505,8 @@ namespace Playout_Manager
 
             DateTime StartTime = add_StartTime.SelectedTime.Value;
 
-           
-            
+
+
             string ClipName = add_mediaSelector.SelectedItem.ToString();
             int FrameIn = Convert.ToInt32(add_f_in.Content);
             int FrameDur = Convert.ToInt32(add_f_dur.Content);
@@ -514,7 +519,7 @@ namespace Playout_Manager
             else if (add_Loop.IsChecked == true) { EndAction = "loop"; }
             else { }
 
-            
+
 
             string cgName = add_TemplateList.SelectedItem.ToString();
             string cgf0 = add_CGf0.Text;
@@ -523,18 +528,71 @@ namespace Playout_Manager
             int cgDelay = Convert.ToInt32(add_CGdelayInSeconds.Text);
             string command = add_commands.Text;
 
-            AddItem(StartTime,ClipName,FrameIn,Framerate,EndAction,FrameDur,cgName,cgLayer,cgDelay,cgf0,cgf1,command);
+            AddItem(StartTime, ClipName, FrameIn, Framerate, EndAction, FrameDur, cgName, cgLayer, cgDelay, cgf0, cgf1, command);
         }
 
         private void SavePlaylist_Click(object sender, RoutedEventArgs e)
         {
-            
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Playout Manager Rundown File (*.pmr)|*.pmr";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                File.WriteAllText(saveFileDialog.FileName, DataGridToString());
+            }
         }
 
-        public void SaveXML()
+        public string DataGridToString()
         {
+            string stringBuilder = "";
+
+            foreach (var item in MainGrid.Items.OfType<DataItem>())
+            {
+                string itemEncoded = item.StartTime + "," + item.Name + "," + item.FrameIn + "," + item.Framerate + "," + item.EndAction + "," + item.Duration + "," + item.CG + "," + item.CGlayer + "," + item.CGdelay+ "," +item.CGfield0 + "," + item.CGfield1 + "," + item.Command;
+                stringBuilder = stringBuilder + itemEncoded + "¬";
+            }
+
+            return stringBuilder;
+        }
+
+        public void StringToDataGrid(string encodedString)
+        {
+            MainGrid.Items.Clear();
+            String[] line = encodedString.Split('¬');
+            foreach (string item in line)
+            {
+                if (item != "") { 
+                string[] property = item.Split(',');
+                AddItem(DateTime.Parse(property[0]), property[1], Convert.ToInt32(property[2]), Convert.ToInt32(property[3]), property[4], Convert.ToInt32(property[5]), property[6], Convert.ToInt32(property[7]), Convert.ToInt32(property[8]), property[9], property[10], property[11]);
+            }
+            }
+        }
+
+
+        private void LoadPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Playout Manager Rundown File (*.pmr)|*.pmr";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string loadString = File.ReadAllText(openFileDialog.FileName);
+                StringToDataGrid(loadString);
+            }
+
             
 
+
+        }
+
+        public void PlayItem(string Name, int frameIn, int framerate, string endaction, int duration, string CG, int cgLayer, int cgDelay, string CGf0, string CGf1, string Command)
+        {
+
+            //This calculates if the clip framerate is different to our caspar channel framerate.
+            double playoutFramerate = GetPlayoutFramerate();
+            double frameRatio = 1 / (Convert.ToDouble(add_f_framerate.Content) / playoutFramerate);
+
+            //Sends all our commands to CasparCG to play the media and the CG
+            _Caspar.Execute("LOAD 1-10 " + Name + "SEEK " + (frameIn*frameRatio) + "LENGTH " + (duration*frameRatio) );
+            _Caspar.Execute("PLAY");
         }
     }
 }

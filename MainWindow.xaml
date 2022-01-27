@@ -40,12 +40,15 @@
 	Header="_File">
 						<MenuItem
                             x:Name="SavePlaylist"
-	  Header="Save Playlist"
+	  Header="Save Rundown"
 	  Icon="{materialDesign:PackIcon Kind=ContentSave}"
 					InputGestureText="Ctrl+S" Click="SavePlaylist_Click"></MenuItem>
 						<MenuItem
-	  Header="Save Playlist As.."
-					InputGestureText="Ctrl+Alt+S"/>
+	  Header="Load Rundown"
+                            x:Name="LoadPlaylist"
+                                  Icon="{materialDesign:PackIcon Kind=File}"
+                                  InputGestureText="Ctrl+L"
+                                  Click="LoadPlaylist_Click" />
 						<MenuItem
 	  Header="Exit"
 	  InputGestureText="Ctrl+E"
