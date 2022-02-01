@@ -592,6 +592,7 @@ namespace Playout_Manager
             return stringBuilder;
         }
 
+
         public void StringToDataGrid(string encodedString)
         {
             MainGrid.Items.Clear();
@@ -721,74 +722,82 @@ namespace Playout_Manager
             aTimer.Enabled = true;
         }
 
+        //takes a DataItem and returns the duration as a timespan
+        public TimeSpan GetItemDuration(DataItem selectedItem)
+        {
+            int DurSeconds = selectedItem.Duration / selectedItem.Framerate;
+            return TimeSpan.FromSeconds(DurSeconds);
+        }
 
+        //this method happens every second
         public void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
             if (_Caspar.Connected)
-            { 
-
-            this.Dispatcher.Invoke(() =>
             {
+
+                this.Dispatcher.Invoke(() =>
+                {
                 //Check DataGrid for items
                 //If item time matches event time, trigger it
 
                 if (MainGrid.Items != null)
-                {
-                    Log("Datagrid not empty, scanning items to find matching time at " + e.SignalTime);
-                    foreach (var playItem in MainGrid.Items.OfType<DataItem>())
                     {
-                        string start = playItem.StartTime.ToString(@"ddMMyyhhmmss");
-                        string now = e.SignalTime.ToString(@"ddMMyyhhmmss");
-
-                        if (start == now)
+                        Log("Datagrid not empty, scanning items to find matching time at " + e.SignalTime);
+                        foreach (var playItem in MainGrid.Items.OfType<DataItem>())
                         {
-                            label_current.Content = "NOW PLAYING: " + playItem.Name;
-                            PlayItem(playItem.Name, playItem.FrameIn, playItem.Framerate, playItem.EndAction, playItem.Duration, playItem.CG, playItem.CGlayer, playItem.CGdelay, playItem.CGfield0, playItem.CGfield1, playItem.Command);
-                            Log(playItem.Name + " has started playing at " + e.SignalTime);
+                            string start = playItem.StartTime.ToString(@"ddMMyyhhmmss");
+                            string now = e.SignalTime.ToString(@"ddMMyyhhmmss");
+
+                            if (start == now)
+                            {
+                                label_current.Content = "NOW PLAYING: " + playItem.Name;
+                                PlayItem(playItem.Name, playItem.FrameIn, playItem.Framerate, playItem.EndAction, playItem.Duration, playItem.CG, playItem.CGlayer, playItem.CGdelay, playItem.CGfield0, playItem.CGfield1, playItem.Command);
+                                Log(playItem.Name + " has started playing at " + e.SignalTime);
+                            }
                         }
                     }
-                }
-                else { Log("Datagrid Empty, not scanning items at " + e.SignalTime); }
+                    else { Log("Datagrid Empty, not scanning items at " + e.SignalTime); }
 
                 //Get the current status of the caspar engine
 
-                try { 
-                ReturnInfo info = _Caspar.Execute("INFO 1-10");
-                XmlDocument infoxml = new XmlDocument();
-                string xmlString = info.Data.Replace("<?xml version=\"1.0\" encoding=\"utf-8\"?>", "");
-                infoxml.RemoveAll();
-                infoxml.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?><xmlroot>" + xmlString + "</xmlroot>");
+                try
+                    {
+                        ReturnInfo info = _Caspar.Execute("INFO 1-10");
+                        XmlDocument infoxml = new XmlDocument();
+                        string xmlString = info.Data.Replace("<?xml version=\"1.0\" encoding=\"utf-8\"?>", "");
+                        infoxml.RemoveAll();
+                        infoxml.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?><xmlroot>" + xmlString + "</xmlroot>");
 
-                XmlNodeList pathList = infoxml.GetElementsByTagName("path");
-                XmlNodeList timeList = infoxml.GetElementsByTagName("time");
+                        XmlNodeList pathList = infoxml.GetElementsByTagName("path");
+                        XmlNodeList timeList = infoxml.GetElementsByTagName("time");
 
-                string currentMediaTime = "";
-                string currentMediaPath = "";
+                        string currentMediaTime = "";
+                        string currentMediaPath = "";
 
-                for (int i = 0; i < pathList.Count; i++)
-                {
-                    currentMediaPath = pathList[i].InnerXml;
-                }
+                        for (int i = 0; i < pathList.Count; i++)
+                        {
+                            currentMediaPath = pathList[i].InnerXml;
+                        }
 
-                for (int i = 0; i < timeList.Count; i++)
-                {
-                    currentMediaTime = timeList[i].InnerXml;
-                }
+                        for (int i = 0; i < timeList.Count; i++)
+                        {
+                            currentMediaTime = timeList[i].InnerXml;
+                        }
 
-                //Update now playing and next time displays
-                label_current.Content = "NOW PLAYING: " + currentMediaPath;
-                timecode_current.Content = currentMediaTime;
+                    //Update now playing and next time displays
+                    label_current.Content = "NOW PLAYING: " + currentMediaPath;
+                        timecode_current.Content = currentMediaTime;
 
-                }
-                catch (Exception xmlerr)
-                {
-                    Log("Couldn't get server data because " + xmlerr.Message);
-                }
-
-
+                    }
+                    catch (Exception xmlerr)
+                    {
+                        Log("Couldn't get server data because " + xmlerr.Message);
+                    }
 
 
-            });
+
+
+                });
 
             }
 
