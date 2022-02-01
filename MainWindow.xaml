@@ -94,10 +94,10 @@
 				</Grid.ColumnDefinitions>
 				<materialDesign:Card Grid.RowSpan="2" Margin="10,0" Background="#FFF44336"/>
 				<materialDesign:Card Grid.RowSpan="2" Margin="10,0" Grid.Column="1" Background="#8BC34A"/>
-				<Label Content="Current Clip" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16"/>
-				<Label Content="Next In" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" Grid.Column="1" Foreground="{DynamicResource {x:Static SystemColors.InactiveCaptionTextBrushKey}}"/>
-				<Label Content="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32" Grid.Row="1"/>
-				<Label Content="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32" Grid.Column="1" Grid.Row="1" Foreground="{DynamicResource {x:Static SystemColors.InactiveCaptionTextBrushKey}}"/>
+				<Label x:Name="label_current" Content="Current Clip" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16"/>
+				<Label x:Name="label_next" Content="Next In" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" Grid.Column="1" Foreground="{DynamicResource {x:Static SystemColors.InactiveCaptionTextBrushKey}}"/>
+                <Label x:Name="timecode_current" Content="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32" Grid.Row="1"/>
+                <Label x:Name="timecode_next" Content="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32" Grid.Column="1" Grid.Row="1" Foreground="{DynamicResource {x:Static SystemColors.InactiveCaptionTextBrushKey}}"/>
 			</Grid>
 			<DataGrid x:Name="MainGrid" Grid.Row="3" IsReadOnly="True"></DataGrid>
 			<ProgressBar Grid.Row="2" Value="35"/>

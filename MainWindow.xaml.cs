@@ -20,6 +20,7 @@ using System.Windows.Shapes;
 using CasparObjects;
 using System.IO;
 using Microsoft.Win32;
+using System.Timers;
 
 
 
@@ -108,6 +109,9 @@ namespace Playout_Manager
             col10.Header = "CG Field 0";
             col11.Header = "CG Field 1";
             col12.Header = "Extra AMCP Command";
+
+            //start the clock
+            SetTimer();
 
 
         }
@@ -492,45 +496,74 @@ namespace Playout_Manager
 
         private void previewUpdateCG(object sender, RoutedEventArgs e)
         {
-
+            string f0 = add_CGf0.Text;
+            string f1 = add_CGf1.Text;
+            int cgLayer = Convert.ToInt32(add_CGlayer.Text);
+            int cgChannel = GetChannel("cg");
+            Template previewTemplate = new CasparObjects.Template();
+            previewTemplate.AddField("f0", f0);
+            previewTemplate.AddField("f1", f1);
+            previewTemplate.UseJSON = true;
+            _Caspar.CG_Update(cgChannel, cgLayer, previewTemplate);
         }
 
         private void previewStopCG(object sender, RoutedEventArgs e)
         {
-
+            int cgLayer = Convert.ToInt32(add_CGlayer.Text);
+            int cgChannel = GetChannel("cg");
+            _Caspar.CG_Stop(cgChannel, cgLayer);
         }
 
+        //this adds a rundown item from the add popup info
         private void AddItemToRundown(object sender, RoutedEventArgs e)
         {
 
+            //get the date and time (still needs fixing to be able to auto calculate offset from previous clip)
             DateTime StartTime = add_StartTime.SelectedTime.Value;
 
-
-
-            string ClipName = add_mediaSelector.SelectedItem.ToString();
-            int FrameIn = Convert.ToInt32(add_f_in.Content);
-            int FrameDur = Convert.ToInt32(add_f_dur.Content);
-            int Framerate = Convert.ToInt32(add_f_framerate.Content);
-
+            //declare all the clip variables and set them to something blank
+            string ClipName = "";
+            int FrameIn = 0;
+            int FrameDur = 0;
+            int Framerate = GetPlayoutFramerate();
             string EndAction = "hold";
 
+            //if there's a clip, get all it's properties
+            if (add_mediaSelector.SelectedItem != null) {
+                ClipName = add_mediaSelector.SelectedItem.ToString();
+                FrameIn = Convert.ToInt32(add_f_in.Content);
+                FrameDur = Convert.ToInt32(add_f_dur.Content);
+                Framerate = Convert.ToInt32(add_f_framerate.Content);
+            }
+            
+            //figure out the end action and set the according variable
             if (add_Hold.IsChecked == true) { EndAction = "hold"; }
             else if (add_Black.IsChecked == true) { EndAction = "black"; }
             else if (add_Loop.IsChecked == true) { EndAction = "loop"; }
             else { }
 
+            //declare cg variables and set default values
+            string cgName = "0";
+            string cgf0 = "";
+            string cgf1 = "";
+            int cgLayer = 20;
+            int cgDelay = 0;
 
+            //if a template is selected, get the template data
+            if (add_TemplateList.SelectedItem != null)
+            {
+                cgName = add_TemplateList.SelectedItem.ToString();
+                cgf0 = add_CGf0.Text;
+                cgf1 = add_CGf1.Text;
+                cgLayer = Convert.ToInt32(add_CGlayer.Text);
+                cgDelay = Convert.ToInt32(add_CGdelayInSeconds.Text);
+            }
             
-            
-            string cgName = add_TemplateList.SelectedItem.ToString();
-            string cgf0 = add_CGf0.Text;
-            string cgf1 = add_CGf1.Text;
-            int cgLayer = Convert.ToInt32(add_CGlayer.Text);
-            int cgDelay = Convert.ToInt32(add_CGdelayInSeconds.Text);
+            //copy the AMCP commands from the text box in to a variable
             string command = add_commands.Text;
             
             
-
+            //get everything we collected and write it to the Datagrid
             AddItem(StartTime, ClipName, FrameIn, Framerate, EndAction, FrameDur, cgName, cgLayer, cgDelay, cgf0, cgf1, command);
         }
 
@@ -604,7 +637,7 @@ namespace Playout_Manager
                 {
                     //Sends all our commands to CasparCG to play the media
                     _Caspar.Execute("STOP 1-10");
-                    _Caspar.Execute("LOAD 1-10 " + Name + "" + loopCommand + " SEEK " + Convert.ToInt32((frameIn * frameRatio)) + " LENGTH " + Convert.ToInt32((duration * frameRatio)));
+                    _Caspar.Execute("LOAD 1-10 \"" + Name + "\"" + loopCommand + " SEEK " + Convert.ToInt32((frameIn * frameRatio)) + " LENGTH " + Convert.ToInt32((duration * frameRatio)));
                     _Caspar.Execute("PLAY 1-10");
                 }
                 catch (Exception playErr)
@@ -636,14 +669,21 @@ namespace Playout_Manager
             //lastly execute the Custom AMCP command
             if (Command != null)
             {
-                _Caspar.Execute(Command);
+                if (Command == "STOP")
+                {
+                    _Caspar.CG_Stop();
+                }
+                else
+                { 
+                    _Caspar.Execute(Command);
+                }
             }
         }
 
         private void PlaySelected_Click(object sender, RoutedEventArgs e)
         {
             DataItem playItem = MainGrid.SelectedItem as DataItem;
-
+            label_current.Content = "NOW PLAYING: " + playItem.Name;
             PlayItem(playItem.Name, playItem.FrameIn, playItem.Framerate, playItem.EndAction, playItem.Duration, playItem.CG, playItem.CGlayer, playItem.CGdelay, playItem.CGfield0, playItem.CGfield1, playItem.Command);
         }
 
@@ -665,6 +705,28 @@ namespace Playout_Manager
         private void CommandMixerVolume_Click(object sender, RoutedEventArgs e)
         {
             add_commands.Text = "CG 1-20 UPDATE 1 ";
+        }
+
+        private static Timer aTimer;
+
+        private void SetTimer()
+        {
+            // Create a timer with a two second interval.
+            aTimer = new System.Timers.Timer(1000);
+            // Hook up the Elapsed event for the timer. 
+            aTimer.Elapsed += OnTimedEvent;
+            aTimer.AutoReset = true;
+            aTimer.Enabled = true;
+        }
+
+        
+        public void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                Log("The Elapsed event was raised at " + e.SignalTime);
+            });
+            
         }
     }
 }
