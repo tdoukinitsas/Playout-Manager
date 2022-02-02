@@ -264,12 +264,31 @@ namespace Playout_Manager
                 try { GetChannels(); } catch (Exception errChannels) { Log("Couldn't get channel list because " + errChannels); }
 
                 Log("Connected to CasparCG Server " + ipbox.Text);
+                Status("CONNECTED", 0);
             }
             else
             {
                 Connect.Foreground = errorBrush;
                 Log("Error connecting to server");
+                Status("ERROR CONNECTING TO SERVER", 0);
             }
+        }
+
+        public void Status(string message, int col)
+        {
+            //This sets up some colours
+            Color sucessCol = (Color)ColorConverter.ConvertFromString("#FF8BC34A");
+            Color errorCol = (Color)ColorConverter.ConvertFromString("#F44336");
+            Color defaultCol = (Color)ColorConverter.ConvertFromString("#FF424242");
+            SolidColorBrush successBrush = new SolidColorBrush(sucessCol);
+            SolidColorBrush errorBrush = new SolidColorBrush(errorCol);
+            SolidColorBrush defaultBrush = new SolidColorBrush(defaultCol);
+
+            if (col == 0) { statusBar.Background = defaultBrush; }
+            else if (col == 1) { statusBar.Background = errorBrush; }
+            else if (col == 2) { statusBar.Background = successBrush; }
+
+            statusBarText.Content = message;
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
@@ -520,7 +539,11 @@ namespace Playout_Manager
         {
 
             //get the date and time (still needs fixing to be able to auto calculate offset from previous clip)
-            DateTime StartTime = add_StartTime.SelectedTime.Value;
+            DateTime StartTime = DateTime.Now;
+            if (add_StartTime.SelectedTime != null)
+            { 
+            StartTime = add_StartTime.SelectedTime.Value;
+            }
 
             //declare all the clip variables and set them to something blank
             string ClipName = "";
@@ -644,7 +667,10 @@ namespace Playout_Manager
                     _Caspar.Execute("PLAY 1-10");
                 }
                 catch (Exception playErr)
-                { Log(playErr.Message); }
+                {
+                    Log(playErr.Message);
+                    Status("ERROR PLAYING MEDIA", 0);
+                }
 
             }
 
@@ -692,12 +718,12 @@ namespace Playout_Manager
 
         private void CommandCGStop_Click(object sender, RoutedEventArgs e)
         {
-            add_commands.Text = "CG 1-20 STOP";
+            add_commands.Text = "CG 1-20 STOP 1";
         }
 
         private void CommandCGClear_Click(object sender, RoutedEventArgs e)
         {
-            add_commands.Text = "CG 1-20 CLEAR";
+            add_commands.Text = "CG 1-20 CLEAR 1";
         }
 
         private void CommandCGUpdate_Click(object sender, RoutedEventArgs e)
@@ -737,12 +763,15 @@ namespace Playout_Manager
 
                 this.Dispatcher.Invoke(() =>
                 {
-                //Check DataGrid for items
-                //If item time matches event time, trigger it
+                    //Check DataGrid for items
+                    //If item time matches event time, trigger it
 
-                if (MainGrid.Items != null)
+                    label_date.Content = DateTime.Now.ToString(@"d");
+                    label_time.Content = DateTime.Now.ToString(@"T");
+
+                    if (MainGrid.Items != null)
                     {
-                        Log("Datagrid not empty, scanning items to find matching time at " + e.SignalTime);
+
                         foreach (var playItem in MainGrid.Items.OfType<DataItem>())
                         {
                             string start = playItem.StartTime.ToString(@"ddMMyyhhmmss");
@@ -758,17 +787,19 @@ namespace Playout_Manager
                     }
                     else { Log("Datagrid Empty, not scanning items at " + e.SignalTime); }
 
-                //Get the current status of the caspar engine
+                    //Get the current status of the caspar engine
 
-                try
+                    try
                     {
                         ReturnInfo info = _Caspar.Execute("INFO 1-10");
                         XmlDocument infoxml = new XmlDocument();
                         string xmlString = info.Data.Replace("<?xml version=\"1.0\" encoding=\"utf-8\"?>", "");
+                        string[] xmlSplit = xmlString.Split(new string[] { "</channel>" }, StringSplitOptions.None);
+                        xmlString = xmlSplit[0] + "</channel>";
                         infoxml.RemoveAll();
-                        infoxml.LoadXml("<?xml version=\"1.0\" encoding=\"utf-8\"?><xmlroot>" + xmlString + "</xmlroot>");
+                        infoxml.LoadXml("<xmlroot>" + xmlString + "</xmlroot>");
 
-                        XmlNodeList pathList = infoxml.GetElementsByTagName("path");
+                        XmlNodeList pathList = infoxml.GetElementsByTagName("name");
                         XmlNodeList timeList = infoxml.GetElementsByTagName("time");
 
                         string currentMediaTime = "";
@@ -776,17 +807,86 @@ namespace Playout_Manager
 
                         for (int i = 0; i < pathList.Count; i++)
                         {
-                            currentMediaPath = pathList[i].InnerXml;
+                            if (i == 0)
+                            {
+                                currentMediaPath = pathList[i].InnerXml;
+                            }
                         }
 
                         for (int i = 0; i < timeList.Count; i++)
                         {
-                            currentMediaTime = timeList[i].InnerXml;
+                            if (i == 0)
+                            {
+                                currentMediaTime = timeList[i].InnerXml;
+                            }
                         }
 
-                    //Update now playing and next time displays
-                    label_current.Content = "NOW PLAYING: " + currentMediaPath;
-                        timecode_current.Content = currentMediaTime;
+                        //Update now playing and next time displays
+                        label_current.Content = "NOW PLAYING: " + currentMediaPath;
+                        double currentTimeDouble = Convert.ToDouble(currentMediaTime);
+                        TimeSpan currentMediaTimeSpan = TimeSpan.FromSeconds(currentTimeDouble);
+                        timecode_current.Content = currentMediaTimeSpan.ToString(@"hh\:mm\:ss");
+
+                        DataItem currentItem = new DataItem();
+
+                        //Go through the list
+                        foreach (var playItem in MainGrid.Items.OfType<DataItem>())
+                        {
+                            //if the item currently playing on the caspar server is the same as this item in the list
+                            if (currentMediaPath.Contains(playItem.Name))
+                            {
+                                //assign the item to our current item
+                                currentItem = playItem;
+                            }
+                        }
+
+
+
+
+                        if (currentItem.Framerate != 0)
+                        {//calculate start and end timespans
+                            TimeSpan startTimeSpan = TimeSpan.FromSeconds(currentItem.FrameIn / currentItem.Framerate);
+                            TimeSpan mediaDurationTimespan = TimeSpan.FromSeconds(currentItem.Duration / currentItem.Framerate);
+                            TimeSpan endTimeSpan = startTimeSpan + mediaDurationTimespan;
+
+                            
+
+                            DurationBar.IsIndeterminate = false;
+
+                            //figure out how the playing bar should work
+                            DurationBar.Minimum = startTimeSpan.TotalSeconds;
+                            DurationBar.Maximum = endTimeSpan.TotalSeconds;
+                            DurationBar.Value = currentMediaTimeSpan.TotalSeconds;
+
+                            //calculate seconds to end
+                            double secsToEnd = endTimeSpan.TotalSeconds - currentMediaTimeSpan.TotalSeconds;
+
+                            timecode_next.Content = TimeSpan.FromSeconds(secsToEnd).ToString(@"hh\:mm\:ss");
+
+
+                            //This sets up some colours
+                            Color greenCol = (Color)ColorConverter.ConvertFromString("#FF8BC34A");
+                            Color redCol = (Color)ColorConverter.ConvertFromString("#F44336");
+                            Color orangeCol = (Color)ColorConverter.ConvertFromString("#FFFF9800");
+                            SolidColorBrush greenBrush = new SolidColorBrush(greenCol);
+                            SolidColorBrush redBrush = new SolidColorBrush(redCol);
+                            SolidColorBrush orangeBrush = new SolidColorBrush(orangeCol);
+
+                            if (secsToEnd < 5) { DurationBar.Foreground = redBrush; }
+                            else if (secsToEnd < 10) { DurationBar.Foreground = orangeBrush; }
+                            else { DurationBar.Foreground = greenBrush; }
+
+                            Status("ON AIR", 1);
+                        }
+                        else
+                        { 
+                            DurationBar.IsIndeterminate = true;
+                            Status("ITEM NOT IN RUNDOWN PLAYING ON SERVER", 2);
+                        }
+
+
+
+
 
                     }
                     catch (Exception xmlerr)
@@ -795,11 +895,57 @@ namespace Playout_Manager
                     }
 
 
-
-
                 });
 
             }
+
+        }
+
+        private void AutoSchedule_Click(object sender, RoutedEventArgs e)
+        {
+
+            int index = 0;
+            DateTime previousStartTime = new DateTime();
+            TimeSpan currentDuration = new TimeSpan();
+
+            string stringBuilder = "";
+
+            foreach (var item in MainGrid.Items.OfType<DataItem>())
+            {
+                try
+                { 
+                    currentDuration = TimeSpan.FromSeconds(item.Duration / item.Framerate);
+                }
+                catch
+                {
+                    currentDuration = TimeSpan.FromSeconds(0);
+                }
+
+                if (index > MainGrid.SelectedIndex)
+                {
+                    item.StartTime = previousStartTime.Add(currentDuration);
+                    
+                    Log("changed item " + index + " start time to auto");
+                }
+
+                string itemEncoded = item.StartTime + "," + item.Name + "," + item.FrameIn + "," + item.Framerate + "," + item.EndAction + "," + item.Duration + "," + item.CG + "," + item.CGlayer + "," + item.CGdelay + "," + item.CGfield0 + "," + item.CGfield1 + "," + item.Command;
+                stringBuilder = stringBuilder + itemEncoded + "¬";
+
+                index = index + 1;
+                previousStartTime = item.StartTime;
+            }
+
+            MainGrid.Items.Clear();
+            String[] line = stringBuilder.Split('¬');
+            foreach (string item in line)
+            {
+                if (item != "")
+                {
+                    string[] property = item.Split(',');
+                    AddItem(DateTime.Parse(property[0]), property[1], Convert.ToInt32(property[2]), Convert.ToInt32(property[3]), property[4], Convert.ToInt32(property[5]), property[6], Convert.ToInt32(property[7]), Convert.ToInt32(property[8]), property[9], property[10], property[11]);
+                }
+            }
+
 
         }
     }
