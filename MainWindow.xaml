@@ -23,8 +23,9 @@
 		<Grid>
 			<Grid.RowDefinitions>
 				<RowDefinition Height="50"/>
+                <RowDefinition Height="40"/>
 				<RowDefinition Height="80"/>
-				<RowDefinition Height="20"/>
+				<RowDefinition Height="30"/>
 				<RowDefinition/>
 				<RowDefinition Height="50"/>
 			</Grid.RowDefinitions>
@@ -83,7 +84,10 @@
 				</Menu>
 				<Image x:Name="Logo" Source="Icon1.ico" Grid.Column="1" Margin="5" Visibility="Hidden"/>
 			</Grid>
-			<Grid Grid.Row="1">
+            <materialDesign:Card x:Name="statusBar" Grid.Row="1" Margin="10">
+                <Label Content="READY" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </materialDesign:Card>
+			<Grid Grid.Row="2">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="11*"/>
 					<RowDefinition Height="19*"/>
@@ -99,9 +103,9 @@
                 <Label x:Name="timecode_current" Content="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32" Grid.Row="1"/>
                 <Label x:Name="timecode_next" Content="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32" Grid.Column="1" Grid.Row="1" Foreground="{DynamicResource {x:Static SystemColors.InactiveCaptionTextBrushKey}}"/>
 			</Grid>
-			<DataGrid x:Name="MainGrid" Grid.Row="3" IsReadOnly="True"></DataGrid>
-			<ProgressBar Grid.Row="2" Value="35"/>
-			<ToolBarTray Grid.Row="4">
+			<DataGrid x:Name="MainGrid" Grid.Row="4" IsReadOnly="True"></DataGrid>
+			<ProgressBar Grid.Row="3" Value="35" Margin="10,0"/>
+			<ToolBarTray Grid.Row="5">
 				<ToolBar Style="{DynamicResource MaterialDesignToolBar}"
 	ClipToBounds="False" HorizontalAlignment="Center">
 					<TextBox x:Name="ipbox" Width="150" Text="localhost"/>
