@@ -231,6 +231,7 @@ namespace Playout_Manager
         public void Log(string message)
         {
             statusText.Content = message;
+            Console.WriteLine(message);
         }
 
         public void GetMediaList()
@@ -901,30 +902,22 @@ namespace Playout_Manager
 
         }
 
-        private void AutoSchedule_Click(object sender, RoutedEventArgs e)
+        public void AutoScheduleFromSelectedItem()
         {
-
             int index = 0;
             DateTime previousStartTime = new DateTime();
-            TimeSpan currentDuration = new TimeSpan();
+            TimeSpan previousDuration = new TimeSpan();
 
             string stringBuilder = "";
 
             foreach (var item in MainGrid.Items.OfType<DataItem>())
             {
-                try
-                { 
-                    currentDuration = TimeSpan.FromSeconds(item.Duration / item.Framerate);
-                }
-                catch
-                {
-                    currentDuration = TimeSpan.FromSeconds(0);
-                }
+
 
                 if (index > MainGrid.SelectedIndex)
                 {
-                    item.StartTime = previousStartTime.Add(currentDuration);
-                    
+                    item.StartTime = previousStartTime.Add(previousDuration);
+
                     Log("changed item " + index + " start time to auto");
                 }
 
@@ -933,6 +926,72 @@ namespace Playout_Manager
 
                 index = index + 1;
                 previousStartTime = item.StartTime;
+
+                try
+                {
+                    previousDuration = TimeSpan.FromSeconds(item.Duration / item.Framerate);
+                }
+                catch
+                {
+                    previousDuration = TimeSpan.FromSeconds(0);
+                }
+            }
+
+            MainGrid.Items.Clear();
+            String[] line = stringBuilder.Split('¬');
+            foreach (string item in line)
+            {
+                if (item != "")
+                {
+                    string[] property = item.Split(',');
+                    AddItem(DateTime.Parse(property[0]), property[1], Convert.ToInt32(property[2]), Convert.ToInt32(property[3]), property[4], Convert.ToInt32(property[5]), property[6], Convert.ToInt32(property[7]), Convert.ToInt32(property[8]), property[9], property[10], property[11]);
+                }
+            }
+        }
+
+        private void AutoSchedule_Click(object sender, RoutedEventArgs e)
+        {
+
+            AutoScheduleFromSelectedItem();
+
+        }
+
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            MainGrid.Items.Remove(MainGrid.SelectedItem);
+        }
+
+        private void NewPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            MainGrid.Items.Clear();
+        }
+
+        private void editTime_update_Click(object sender, RoutedEventArgs e)
+        {
+            int index = 0;
+            int selected = MainGrid.SelectedIndex;
+            string stringBuilder = "";
+
+            foreach (var item in MainGrid.Items.OfType<DataItem>())
+            {
+
+
+                if (index == MainGrid.SelectedIndex)
+                {
+                    DateTime StartTime = DateTime.Now;
+                    if (add_StartTime.SelectedTime != null)
+                    {
+                        StartTime = editTime_StartTime.SelectedTime.Value;
+                    }
+
+                    item.StartTime = StartTime;
+                }
+
+                string itemEncoded = item.StartTime + "," + item.Name + "," + item.FrameIn + "," + item.Framerate + "," + item.EndAction + "," + item.Duration + "," + item.CG + "," + item.CGlayer + "," + item.CGdelay + "," + item.CGfield0 + "," + item.CGfield1 + "," + item.Command;
+                stringBuilder = stringBuilder + itemEncoded + "¬";
+
+                index = index + 1;
+
             }
 
             MainGrid.Items.Clear();
@@ -947,6 +1006,50 @@ namespace Playout_Manager
             }
 
 
+            if (editTime_auto.IsChecked == true)
+            {
+                MainGrid.SelectedIndex = selected;
+                AutoScheduleFromSelectedItem();
+            }
+        }
+
+        private void EditTime_Click(object sender, RoutedEventArgs e)
+        {
+            editTime_StartTime.SelectedTime = DateTime.Now;
+            editTime_StartDate.SelectedDate = DateTime.Now;
+        }
+
+        private void Pause_Click(object sender, RoutedEventArgs e)
+        {
+            _Caspar.Execute("PAUSE 1-10");
+            Status("MEDIA PAUSED", 2);
+        }
+
+        private void Stop_Click(object sender, RoutedEventArgs e)
+        {
+            _Caspar.Execute("STOP 1-10");
+            Status("MEDIA STOPPED", 0);
+        }
+
+        private void PlayNext_Click(object sender, RoutedEventArgs e)
+        {
+            MainGrid.SelectedIndex = MainGrid.SelectedIndex + 1;
+            DataItem playItem = MainGrid.SelectedItem as DataItem;
+            label_current.Content = "NOW PLAYING: " + playItem.Name;
+            PlayItem(playItem.Name, playItem.FrameIn, playItem.Framerate, playItem.EndAction, playItem.Duration, playItem.CG, playItem.CGlayer, playItem.CGdelay, playItem.CGfield0, playItem.CGfield1, playItem.Command);
+        }
+
+        private void Resume_Click(object sender, RoutedEventArgs e)
+        {
+            _Caspar.Execute("PLAY 1-10");
+        }
+
+        private void Panic_Click(object sender, RoutedEventArgs e)
+        {
+            int playout = GetChannel("playout");
+            int cg = GetChannel("cg");
+            _Caspar.Execute("CLEAR " + playout);
+            _Caspar.Execute("CLEAR " + cg);
         }
     }
 }

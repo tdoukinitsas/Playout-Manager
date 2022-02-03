@@ -1,113 +1,136 @@
 ﻿<Window x:Class="Playout_Manager.MainWindow"
-	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-		TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-		TextElement.FontWeight="Regular"
-		TextElement.FontSize="13"
-		TextOptions.TextFormattingMode="Ideal" 
-		TextOptions.TextRenderingMode="Auto"        
-		Background="{DynamicResource MaterialDesignPaper}"
-		FontFamily="{DynamicResource MaterialDesignFont}"
-	xmlns:local="clr-namespace:Playout_Manager"
-		mc:Ignorable="d"
-		Title="Playout Manager" Height="450" Width="800" Icon="Icon1.ico">
-	<materialDesign:DialogHost
-		
-  
-  CloseOnClickAway="True"
-  DialogTheme="Inherit"
-		>
-		<Grid>
-			<Grid.RowDefinitions>
-				<RowDefinition Height="50"/>
-                <RowDefinition Height="40"/>
-				<RowDefinition Height="80"/>
-				<RowDefinition Height="30"/>
-				<RowDefinition/>
-				<RowDefinition Height="50"/>
-			</Grid.RowDefinitions>
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="50"/>
-				</Grid.ColumnDefinitions>
-				<Menu
-  IsMainMenu="True"
-			>
-					<MenuItem
-	Header="_File">
-						<MenuItem
-                            x:Name="SavePlaylist"
-	  Header="Save Rundown"
-	  Icon="{materialDesign:PackIcon Kind=ContentSave}"
-					InputGestureText="Ctrl+S" Click="SavePlaylist_Click"></MenuItem>
-						<MenuItem
-	  Header="Load Rundown"
-                            x:Name="LoadPlaylist"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dd="urn:gong-wpf-dragdrop"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        xmlns:local="clr-namespace:Playout_Manager"
+        mc:Ignorable="d"
+        Title="Playout Manager"
+        Height="450"
+        Width="800"
+        Icon="Icon1.ico">
+    <materialDesign:DialogHost CloseOnClickAway="True"
+                               DialogTheme="Inherit">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="40" />
+                <RowDefinition Height="80" />
+                <RowDefinition Height="30" />
+                <RowDefinition />
+                <RowDefinition Height="50" />
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="50" />
+                </Grid.ColumnDefinitions>
+                <Menu IsMainMenu="True">
+                    <MenuItem Header="_File">
+                        <MenuItem x:Name="NewPlaylist"
+                                  Header="New Rundown"
                                   Icon="{materialDesign:PackIcon Kind=File}"
+                                  InputGestureText="Ctrl+N"
+                                  Click="NewPlaylist_Click"></MenuItem>
+                        <MenuItem x:Name="SavePlaylist"
+                                  Header="Save Rundown"
+                                  Icon="{materialDesign:PackIcon Kind=ContentSave}"
+                                  InputGestureText="Ctrl+S"
+                                  Click="SavePlaylist_Click"></MenuItem>
+                        <MenuItem Header="Load Rundown"
+                                  x:Name="LoadPlaylist"
+                                  Icon="{materialDesign:PackIcon Kind=Harddisk}"
                                   InputGestureText="Ctrl+L"
                                   Click="LoadPlaylist_Click" />
-						<MenuItem
-	  Header="Exit"
-	  InputGestureText="Ctrl+E"
-	  Icon="{materialDesign:PackIcon Kind=ExitToApp}" />
-					</MenuItem>
-					<MenuItem
-	Header="_Edit">
-						<MenuItem
-	  Header="_Cut"
-	  Command="Cut"
-	  Icon="{materialDesign:PackIcon Kind=ContentCut}"
-					InputGestureText="Ctrl+X"/>
-						<MenuItem
-	  Header="_Copy"
-	  Command="Copy"
-	  Icon="{materialDesign:PackIcon Kind=ContentCopy}"
-					InputGestureText="Ctrl+C"/>
-						<MenuItem
-	  Header="_Paste"
-	  Command="Paste"
-	  Icon="{materialDesign:PackIcon Kind=ContentPaste}"
-					InputGestureText="Ctrl+V"/>
-					</MenuItem>
-					<MenuItem
-	Header="_View">
-						<MenuItem
-	  Header="_Toggle Fullscreen"
-					
-	  Icon="{materialDesign:PackIcon Kind=Fullscreen}"
-					InputGestureText="F12" Click="ToggleFullscreen"/>
-					</MenuItem>
-				</Menu>
-				<Image x:Name="Logo" Source="Icon1.ico" Grid.Column="1" Margin="5" Visibility="Hidden"/>
-			</Grid>
-            <materialDesign:Card x:Name="statusBar" Grid.Row="1" Margin="10">
+                        <MenuItem Header="Exit"
+                                  InputGestureText="Ctrl+E"
+                                  Icon="{materialDesign:PackIcon Kind=ExitToApp}" />
+                    </MenuItem>
+                    <MenuItem Header="_Edit">
+                        <MenuItem Header="_Cut"
+                                  Command="Cut"
+                                  Icon="{materialDesign:PackIcon Kind=ContentCut}"
+                                  InputGestureText="Ctrl+X" />
+                        <MenuItem Header="_Copy"
+                                  Command="Copy"
+                                  Icon="{materialDesign:PackIcon Kind=ContentCopy}"
+                                  InputGestureText="Ctrl+C" />
+                        <MenuItem Header="_Paste"
+                                  Command="Paste"
+                                  Icon="{materialDesign:PackIcon Kind=ContentPaste}"
+                                  InputGestureText="Ctrl+V" />
+                    </MenuItem>
+                    <MenuItem Header="_View">
+                        <MenuItem Header="_Toggle Fullscreen"
+                                  Icon="{materialDesign:PackIcon Kind=Fullscreen}"
+                                  InputGestureText="F12"
+                                  Click="ToggleFullscreen" />
+                    </MenuItem>
+                    <MenuItem Header="_Help">
+                        <MenuItem Header="_About"
+                                  Icon="{materialDesign:PackIcon Kind=Information}"
+                                  Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
+                            <MenuItem.CommandParameter>
+                                <StackPanel Margin="16"
+                                            Width="640">
+                                    <TextBlock Style="{StaticResource MaterialDesignHeadline2TextBlock}"
+                                               Text="Playout Manager Alpha"
+                                               Margin="10"/>
+                                    <TextBlock Style="{StaticResource MaterialDesignOverlineTextBlock}"
+                                               Text="Developed by Thomas Doukinitsas | www.doukinitsas.info | thomas@creativityfilms.gr"
+                                               Margin="10"/>
+                                    <materialDesign:Card Margin="10">
+                                        <TextBlock Text="Caspar CG Client with Scheduling Capabilities."
+                                                   Margin="10" />
+                                    </materialDesign:Card>
+                                </StackPanel>
+                            </MenuItem.CommandParameter>
+                        </MenuItem>
+                    </MenuItem>
+                </Menu>
+                <Image x:Name="Logo"
+                       Source="Icon1.ico"
+                       Grid.Column="1"
+                       Margin="5"
+                       Visibility="Hidden" />
+            </Grid>
+            <materialDesign:Card x:Name="statusBar"
+                                 Grid.Row="1"
+                                 Margin="10">
                 <Label x:Name="statusBarText"
                        Content="READY TO CONNECT"
-                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
             </materialDesign:Card>
-			<Grid Grid.Row="2">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="11*"/>
-					<RowDefinition Height="19*"/>
-				</Grid.RowDefinitions>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="1*"/>
-					<ColumnDefinition Width="1*"/>
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="11*" />
+                    <RowDefinition Height="19*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="200" />
                 </Grid.ColumnDefinitions>
-				<materialDesign:Card Grid.RowSpan="2"
+                <materialDesign:Card Grid.RowSpan="2"
                                      Margin="10,0,5,0"
-                                     Background="#FFF44336"/>
-				<materialDesign:Card Grid.RowSpan="2"
-                                     Margin="5,0,10,0"
-                                     Grid.Column="1" Background="#8BC34A"/>
+                                     Background="#FFF44336" />
                 <materialDesign:Card Grid.RowSpan="2"
                                      Margin="5,0,10,0"
-                                     Grid.Column="2"/>
+                                     Grid.Column="1"
+                                     Background="#8BC34A" />
+                <materialDesign:Card Grid.RowSpan="2"
+                                     Margin="5,0,10,0"
+                                     Grid.Column="2" />
                 <Label x:Name="label_current"
                        Content="Current Clip"
                        VerticalAlignment="Center"
@@ -115,192 +138,307 @@
                        FontSize="16" />
                 <Label x:Name="label_next"
                        Content="Clip Ends In"
-                       VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" Grid.Column="1" Foreground="{DynamicResource {x:Static SystemColors.InactiveCaptionTextBrushKey}}"/>
-                <Label x:Name="timecode_current" Content="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32" Grid.Row="1"/>
-                <Label x:Name="timecode_next" Content="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32" Grid.Column="1" Grid.Row="1" Foreground="{DynamicResource {x:Static SystemColors.InactiveCaptionTextBrushKey}}"/>
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="16"
+                       Grid.Column="1"
+                       Foreground="{DynamicResource {x:Static SystemColors.InactiveCaptionTextBrushKey}}" />
+                <Label x:Name="timecode_current"
+                       Content="00:00:00"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="32"
+                       Grid.Row="1" />
+                <Label x:Name="timecode_next"
+                       Content="00:00:00"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="32"
+                       Grid.Column="1"
+                       Grid.Row="1"
+                       Foreground="{DynamicResource {x:Static SystemColors.InactiveCaptionTextBrushKey}}" />
                 <Label x:Name="label_date"
-                       Content="Date"
+                       Content=""
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"
                        FontSize="16"
                        Grid.Column="2" />
-                <Label x:Name="label_time" Content="00:00:00" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32" Grid.Row="1" Grid.Column="2"/>
+                <Label x:Name="label_time"
+                       Content=""
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="32"
+                       Grid.Row="1"
+                       Grid.Column="2" />
             </Grid>
-			<DataGrid x:Name="MainGrid" Grid.Row="4" IsReadOnly="True"></DataGrid>
-			<ProgressBar x:Name="DurationBar" Grid.Row="3"
+            <DataGrid x:Name="MainGrid"
+                      Grid.Row="4"
+                      IsReadOnly="True"
+                      dd:DragDrop.IsDragSource="True"
+                      dd:DragDrop.IsDropTarget="True"></DataGrid>
+            <ProgressBar x:Name="DurationBar"
+                         Grid.Row="3"
                          Margin="10,0"
                          Background="#FF424242"
                          BorderBrush="#FF424242"
                          Foreground="#FF8BC34A"
                          Height="9.8" />
-			<ToolBarTray Grid.Row="5">
-				<ToolBar Style="{DynamicResource MaterialDesignToolBar}"
-	ClipToBounds="False" HorizontalAlignment="Center">
-					<TextBox x:Name="ipbox" Width="150" Text="localhost"/>
-					<Button x:Name="Connect" Content="{materialDesign:PackIcon Kind=Connection}" ToolTip="Connect to Server" Click="Connect_Click"/>
-				</ToolBar>
-				<ToolBar Style="{DynamicResource MaterialDesignToolBar}"
-	ClipToBounds="False" HorizontalAlignment="Center" x:Name="toolbar_addControls" Visibility="Collapsed">
-					<Button x:Name="Add" Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}" Content="{materialDesign:PackIcon Kind=Plus}" ToolTip="Add Media">
-						<Button.CommandParameter>
-							<StackPanel
-		Margin="16"
-								Width="640">
-								<Label Content="Add Media Clip to Rundown"/>
+            <ToolBarTray Grid.Row="5">
+                <ToolBar Style="{DynamicResource MaterialDesignToolBar}"
+                         ClipToBounds="False"
+                         HorizontalAlignment="Center">
+                    <TextBox x:Name="ipbox"
+                             Width="150"
+                             Text="localhost" />
+                    <Button x:Name="Connect"
+                            Content="{materialDesign:PackIcon Kind=Connection}"
+                            ToolTip="Connect to Server"
+                            Click="Connect_Click" />
+                </ToolBar>
+                <ToolBar Style="{DynamicResource MaterialDesignToolBar}"
+                         ClipToBounds="False"
+                         HorizontalAlignment="Center"
+                         x:Name="toolbar_addControls"
+                         Visibility="Collapsed">
+                    <Button x:Name="Add"
+                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                            Content="{materialDesign:PackIcon Kind=Plus}"
+                            ToolTip="Add Media">
+                        <Button.CommandParameter>
+                            <StackPanel Margin="16"
+                                        Width="640">
+                                <Label Content="Add Media Clip to Rundown" />
 
-								<ComboBox x:Name="add_mediaSelector" materialDesign:HintAssist.Hint="Clip Name" Margin="10" DropDownClosed="MediaListChanged"/>
+                                <ComboBox x:Name="add_mediaSelector"
+                                          materialDesign:HintAssist.Hint="Clip Name"
+                                          Margin="10"
+                                          DropDownClosed="MediaListChanged" />
 
-								<Grid>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition Width="3*"></ColumnDefinition>
-									</Grid.ColumnDefinitions>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="3*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
 
-									<Button
-									x:Name="add_Play"
-		  Style="{StaticResource MaterialDesignFlatButton}"
-		  HorizontalAlignment="Left"
-		  Content="PLAY"  Grid.Column="0" Click="SendPlayCommand" />
-									<Button
-									x:Name="add_Pause"
-		  Style="{StaticResource MaterialDesignFlatButton}"
-		  HorizontalAlignment="Left"
-		  Content="PAUSE"  Grid.Column="1" Click="SendPauseCommand" />
-
-
-									<Button
-									x:Name="add_Refresh"
-		  Style="{StaticResource MaterialDesignFlatButton}"
-		  HorizontalAlignment="Right"
-		  Content="REFRESH CLIPS" Click="RefreshMediaList" Grid.Column="2" />
-								</Grid>
-
-
-
-
-								<Grid>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-									</Grid.ColumnDefinitions>
-									<DatePicker Style="{StaticResource MaterialDesignFloatingHintDatePicker}" x:Name="add_StartDate" materialDesign:HintAssist.Hint="Start Date" Margin="10"/>
-                                    <materialDesign:TimePicker WithSeconds="True" Style="{StaticResource MaterialDesignFloatingHintTimePicker}" x:Name="add_StartTime" materialDesign:HintAssist.Hint="Start Time" Margin="10" Grid.Column="1"/>
-								</Grid>
-								<Slider IsSnapToTickEnabled="True"
-	TickFrequency="1" ToolTip="In Point" x:Name="add_Slider_In" Minimum="0" Maximum="1" Margin="10" ValueChanged="InSliderValueChanged"/>
-								<Slider IsSnapToTickEnabled="True"
-	TickFrequency="1" ToolTip="Out Point" x:Name="add_Slider_Out" Minimum="0" Maximum="1" Margin="10" ValueChanged="OutValueSliderChanged"/>
-								<Grid>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-									</Grid.ColumnDefinitions>
-									<TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" x:Name="add_In" materialDesign:HintAssist.Hint="In" Margin="10" Grid.Column="1"/>
-									<TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" x:Name="add_Duration" materialDesign:HintAssist.Hint="Duration" Grid.Column="2" Margin="10"/>
-									<TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" x:Name="add_Out" materialDesign:HintAssist.Hint="Out" Grid.Column="3" Margin="10"/>
-									<CheckBox x:Name="add_EnablePreview" Content="Enable Preview" Grid.Column="0" Margin="10"/>
-								</Grid>
-								<Grid>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-									</Grid.ColumnDefinitions>
-									<Label x:Name="add_f_in" ToolTip="In Frame" Grid.Column="1" Margin="10"/>
-									<Label x:Name="add_f_dur" ToolTip="Total Frames" Grid.Column="2" Margin="10"/>
-									<Label x:Name="add_f_out" ToolTip="Out Frame" Grid.Column="3" Margin="10"/>
-									<Label x:Name="add_f_framerate" ToolTip="Framerate" Grid.Column="0" Margin="10"/>
-								</Grid>
-
-								<materialDesign:Card>
-									<StackPanel
-  Orientation="Horizontal"
-  Margin="10">
-										<Label Content="Once clip has finished playing:"/>
-										<RadioButton
-	Style="{StaticResource MaterialDesignTabRadioButton}"
-    x:Name="add_Hold"
-	Margin="10"
-	IsChecked="True"
-	Content="Hold" />
-										<RadioButton
-	Style="{StaticResource MaterialDesignTabRadioButton}"
-                                            x:Name="add_Black"
-	Margin="10"
-	IsChecked="False"
-	Content="Black" />
-										<RadioButton
-	Style="{StaticResource MaterialDesignTabRadioButton}"
-                                            x:Name="add_Loop"
-	Margin="10"
-	IsChecked="False"
-	Content="Loop" />
-									</StackPanel>
-								</materialDesign:Card>
+                                    <Button x:Name="add_Play"
+                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                            HorizontalAlignment="Left"
+                                            Content="PLAY"
+                                            Grid.Column="0"
+                                            Click="SendPlayCommand" />
+                                    <Button x:Name="add_Pause"
+                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                            HorizontalAlignment="Left"
+                                            Content="PAUSE"
+                                            Grid.Column="1"
+                                            Click="SendPauseCommand" />
 
 
-								<Label Content="CG Template" Margin="0,20,0,0"/>
-								<ComboBox x:Name="add_TemplateList" Margin="10"/>
-
-								<Grid>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition Width="2*"></ColumnDefinition>
-									</Grid.ColumnDefinitions>
-
-									<Button
-									x:Name="add_playcg"
-		  Style="{StaticResource MaterialDesignFlatButton}"
-		  HorizontalAlignment="Left"
-		  Content="PLAY CG" Grid.Column="0" Click="previewPlayCG"  />
-
-									<Button
-									x:Name="add_updatecg"
-		  Style="{StaticResource MaterialDesignFlatButton}"
-		  HorizontalAlignment="Left"
-		  Content="UPDATE CG" Grid.Column="1" Click="previewUpdateCG"  />
-
-									<Button
-									x:Name="add_stopcg"
-		  Style="{StaticResource MaterialDesignFlatButton}"
-		  HorizontalAlignment="Left"
-		  Content="STOP CG" Grid.Column="2" Click="previewStopCG"  />
-
-
-
-									<Button
-									x:Name="add_RefreshTemplates"
-		  Style="{StaticResource MaterialDesignFlatButton}"
-		  HorizontalAlignment="Right"
-		  Content="REFRESH TEMPLATES" Click="RefreshTemplatesList" Grid.Column="3"  />
-
-								</Grid>
+                                    <Button x:Name="add_Refresh"
+                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                            HorizontalAlignment="Right"
+                                            Content="REFRESH CLIPS"
+                                            Click="RefreshMediaList"
+                                            Grid.Column="2" />
+                                </Grid>
 
 
 
 
-								<Grid>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="2*"></ColumnDefinition>
-										<ColumnDefinition Width="2*"></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-									</Grid.ColumnDefinitions>
-									<TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" x:Name="add_CGf0" materialDesign:HintAssist.Hint="Field 0" Margin="10" Grid.Column="0"/>
-									<TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" x:Name="add_CGf1" materialDesign:HintAssist.Hint="Field 1" Margin="10" Grid.Column="1" />
-									<TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" x:Name="add_CGlayer" materialDesign:HintAssist.Hint="Layer" Text="20"  Margin="10" Grid.Column="2"/>
-									<TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" x:Name="add_CGdelayInSeconds" materialDesign:HintAssist.Hint="Delay" Text="0" Margin="10" Grid.Column="3"/>
-								</Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <DatePicker Style="{StaticResource MaterialDesignFloatingHintDatePicker}"
+                                                x:Name="add_StartDate"
+                                                materialDesign:HintAssist.Hint="Start Date"
+                                                Margin="10" />
+                                    <materialDesign:TimePicker WithSeconds="True"
+                                                               Style="{StaticResource MaterialDesignFloatingHintTimePicker}"
+                                                               x:Name="add_StartTime"
+                                                               materialDesign:HintAssist.Hint="Start Time"
+                                                               Margin="10"
+                                                               Grid.Column="1" />
+                                </Grid>
+                                <Slider IsSnapToTickEnabled="True"
+                                        TickFrequency="1"
+                                        ToolTip="In Point"
+                                        x:Name="add_Slider_In"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        Margin="10"
+                                        ValueChanged="InSliderValueChanged" />
+                                <Slider IsSnapToTickEnabled="True"
+                                        TickFrequency="1"
+                                        ToolTip="Out Point"
+                                        x:Name="add_Slider_Out"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        Margin="10"
+                                        ValueChanged="OutValueSliderChanged" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                             x:Name="add_In"
+                                             materialDesign:HintAssist.Hint="In"
+                                             Margin="10"
+                                             Grid.Column="1" />
+                                    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                             x:Name="add_Duration"
+                                             materialDesign:HintAssist.Hint="Duration"
+                                             Grid.Column="2"
+                                             Margin="10" />
+                                    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                             x:Name="add_Out"
+                                             materialDesign:HintAssist.Hint="Out"
+                                             Grid.Column="3"
+                                             Margin="10" />
+                                    <CheckBox x:Name="add_EnablePreview"
+                                              Content="Enable Preview"
+                                              Grid.Column="0"
+                                              Margin="10" />
+                                </Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label x:Name="add_f_in"
+                                           ToolTip="In Frame"
+                                           Grid.Column="1"
+                                           Margin="10" />
+                                    <Label x:Name="add_f_dur"
+                                           ToolTip="Total Frames"
+                                           Grid.Column="2"
+                                           Margin="10" />
+                                    <Label x:Name="add_f_out"
+                                           ToolTip="Out Frame"
+                                           Grid.Column="3"
+                                           Margin="10" />
+                                    <Label x:Name="add_f_framerate"
+                                           ToolTip="Framerate"
+                                           Grid.Column="0"
+                                           Margin="10" />
+                                </Grid>
+
+                                <materialDesign:Card>
+                                    <StackPanel Orientation="Horizontal"
+                                                Margin="10">
+                                        <Label Content="Once clip has finished playing:" />
+                                        <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}"
+                                                     x:Name="add_Hold"
+                                                     Margin="10"
+                                                     IsChecked="True"
+                                                     Content="Hold" />
+                                        <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}"
+                                                     x:Name="add_Black"
+                                                     Margin="10"
+                                                     IsChecked="False"
+                                                     Content="Black" />
+                                        <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}"
+                                                     x:Name="add_Loop"
+                                                     Margin="10"
+                                                     IsChecked="False"
+                                                     Content="Loop" />
+                                    </StackPanel>
+                                </materialDesign:Card>
 
 
-								<Label Content="Additional Commands" Margin="0,20,0,0"/>
-								<TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" x:Name="add_commands" materialDesign:HintAssist.Hint="Extra AMCP Commands" Margin="10"/>
+                                <Label Content="CG Template"
+                                       Margin="0,20,0,0" />
+                                <ComboBox x:Name="add_TemplateList"
+                                          Margin="10" />
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="2*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button x:Name="add_playcg"
+                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                            HorizontalAlignment="Left"
+                                            Content="PLAY CG"
+                                            Grid.Column="0"
+                                            Click="previewPlayCG" />
+
+                                    <Button x:Name="add_updatecg"
+                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                            HorizontalAlignment="Left"
+                                            Content="UPDATE CG"
+                                            Grid.Column="1"
+                                            Click="previewUpdateCG" />
+
+                                    <Button x:Name="add_stopcg"
+                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                            HorizontalAlignment="Left"
+                                            Content="STOP CG"
+                                            Grid.Column="2"
+                                            Click="previewStopCG" />
+
+
+
+                                    <Button x:Name="add_RefreshTemplates"
+                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                            HorizontalAlignment="Right"
+                                            Content="REFRESH TEMPLATES"
+                                            Click="RefreshTemplatesList"
+                                            Grid.Column="3" />
+
+                                </Grid>
+
+
+
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"></ColumnDefinition>
+                                        <ColumnDefinition Width="2*"></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                             x:Name="add_CGf0"
+                                             materialDesign:HintAssist.Hint="Field 0"
+                                             Margin="10"
+                                             Grid.Column="0" />
+                                    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                             x:Name="add_CGf1"
+                                             materialDesign:HintAssist.Hint="Field 1"
+                                             Margin="10"
+                                             Grid.Column="1" />
+                                    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                             x:Name="add_CGlayer"
+                                             materialDesign:HintAssist.Hint="Layer"
+                                             Text="20"
+                                             Margin="10"
+                                             Grid.Column="2" />
+                                    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                             x:Name="add_CGdelayInSeconds"
+                                             materialDesign:HintAssist.Hint="Delay"
+                                             Text="0"
+                                             Margin="10"
+                                             Grid.Column="3" />
+                                </Grid>
+
+
+                                <Label Content="Additional Commands"
+                                       Margin="0,20,0,0" />
+                                <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                         x:Name="add_commands"
+                                         materialDesign:HintAssist.Hint="Extra AMCP Commands"
+                                         Margin="10" />
                                 <materialDesign:Card>
                                     <StackPanel Orientation="Horizontal"
                                                 Margin="10">
@@ -317,10 +455,6 @@
                                                 Content="CG UPDATE"
                                                 x:Name="CommandCGUpdate"
                                                 Click="CommandCGUpdate_Click" />
-                                        <Button Style="{StaticResource MaterialDesignFlatButton}"
-                                                Content="MIXER VOLUME"
-                                                x:Name="CommandMixerVolume"
-                                                Click="CommandMixerVolume_Click" />
                                     </StackPanel>
                                 </materialDesign:Card>
 
@@ -331,58 +465,146 @@
 
 
                                 <Grid>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition></ColumnDefinition>
-										<ColumnDefinition></ColumnDefinition>
-									</Grid.ColumnDefinitions>
-                                    
-									<Button
-		  
-		  HorizontalAlignment="Right"
-		  Content="ADD TO RUNDOWN"
-										Grid.Column="1"  Background="#FF8BC34A" BorderBrush="#FF8BC34A" Click="AddItemToRundown"/>
-									<Button
-		  Style="{StaticResource MaterialDesignFlatButton}"
-		  IsCancel="True"
-		  Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-		  CommandParameter="Sample2Cancel"
-		  HorizontalAlignment="Left"
-		  Content="CANCEL" Foreground="#FFF44336"  />
-								</Grid>
-							</StackPanel>
-						</Button.CommandParameter>
-					</Button>
-					<Button x:Name="Edit" Content="{materialDesign:PackIcon Kind=Edit}" ToolTip="Edit Item"/>
-					<Button x:Name="Delete" Content="{materialDesign:PackIcon Kind=Delete}" ToolTip="Remove Item"/>
-				</ToolBar>
-				<ToolBar
-				
-	Style="{DynamicResource MaterialDesignToolBar}"
-	ClipToBounds="False" x:Name="toolbar_transportcontrols" HorizontalAlignment="Center" Visibility="Collapsed">
-					<Button Content="{materialDesign:PackIcon Kind=Play}" Foreground="#FF8BC34A" ToolTip="Play" x:Name="PlaySelected"
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button HorizontalAlignment="Right"
+                                            Content="ADD TO RUNDOWN"
+                                            Grid.Column="1"
+                                            Background="#FF8BC34A"
+                                            BorderBrush="#FF8BC34A"
+                                            Click="AddItemToRundown" />
+                                    <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                            IsCancel="True"
+                                            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                            CommandParameter="Sample2Cancel"
+                                            HorizontalAlignment="Left"
+                                            Content="CANCEL"
+                                            Foreground="#FFF44336" />
+                                </Grid>
+                            </StackPanel>
+                        </Button.CommandParameter>
+                    </Button>
+                    <Button x:Name="Edit"
+                            Content="{materialDesign:PackIcon Kind=Edit}"
+                            ToolTip="Edit Selected Item"
+                            IsEnabled="False" />
+                    <Button x:Name="EditTime"
+                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                            Content="{materialDesign:PackIcon Kind=ClockEdit}"
+                            ToolTip="Edit Start Time for Selected Item"
+                            Click="EditTime_Click">
+                        <Button.CommandParameter>
+                            <StackPanel Margin="16"
+                                        Width="640">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <DatePicker Style="{StaticResource MaterialDesignFloatingHintDatePicker}"
+                                                x:Name="editTime_StartDate"
+                                                materialDesign:HintAssist.Hint="Start Date"
+                                                Margin="10" />
+                                    <materialDesign:TimePicker WithSeconds="True"
+                                                               Style="{StaticResource MaterialDesignFloatingHintTimePicker}"
+                                                               x:Name="editTime_StartTime"
+                                                               materialDesign:HintAssist.Hint="Start Time"
+                                                               Margin="10"
+                                                               Grid.Column="1" />
+                                </Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox x:Name="editTime_auto"
+                                        Content="Auto-calculate new start times for all items"
+                                              Margin="10" />
+                                    <Button Content="UPDATE SELECTED"
+                                            x:Name="editTime_update"
+                                            Margin="10"
+                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Right"
+                                            Click="editTime_update_Click" />
+                                </Grid>
+                            </StackPanel>
+                        </Button.CommandParameter>
+                    </Button>
+                    <Button x:Name="Delete"
+                            Content="{materialDesign:PackIcon Kind=Delete}"
+                            ToolTip="Remove Item"
+                            Click="Delete_Click" />
+                </ToolBar>
+                <ToolBar Style="{DynamicResource MaterialDesignToolBar}"
+                         ClipToBounds="False"
+                         x:Name="toolbar_transportcontrols"
+                         HorizontalAlignment="Center"
+                         Visibility="Collapsed">
+                    <Button Content="{materialDesign:PackIcon Kind=Play}"
+                            Foreground="#FF8BC34A"
+                            ToolTip="Play"
+                            x:Name="PlaySelected"
                             Click="PlaySelected_Click" />
-					<Button x:Name="AutoSchedule" Content="{materialDesign:PackIcon Kind=Stopwatch}" Foreground="#FF8BC34A" ToolTip="Auto Shedule"
+                    <Button x:Name="AutoSchedule"
+                            Content="{materialDesign:PackIcon Kind=Stopwatch}"
+                            Foreground="#FF8BC34A"
+                            ToolTip="Auto Shedule"
                             Click="AutoSchedule_Click" />
-					<Button Content="{materialDesign:PackIcon Kind=Pause}" ToolTip="Pause"/>
-					<Button Content="{materialDesign:PackIcon Kind=Stop}" ToolTip="Stop"/>
-					<Button Content="{materialDesign:PackIcon Kind=NextTitle}" ToolTip="Play Next"/>
-					<Button Content="{materialDesign:PackIcon Kind=AlertOctagon}" Foreground="#F44336" ToolTip="Panic"/>
-				</ToolBar>
+                    <Button x:Name="Pause" 
+                        Content="{materialDesign:PackIcon Kind=Pause}"
+                            ToolTip="Pause"
+                            Click="Pause_Click" />
+                    <Button x:Name="Resume" 
+                        Content="{materialDesign:PackIcon Kind=PlayPause}"
+                            ToolTip="Resume"
+                            Click="Resume_Click" />
+                    <Button x:Name="Stop"
+                            Content="{materialDesign:PackIcon Kind=Stop}"
+                            ToolTip="Stop"
+                            Click="Stop_Click" />
+                    <Button x:Name="PlayNext"
+                        Content="{materialDesign:PackIcon Kind=NextTitle}"
+                            ToolTip="Play Next"
+                            Click="PlayNext_Click"/>
+                    <Button x:Name="Panic"
+                            Content="{materialDesign:PackIcon Kind=AlertOctagon}"
+                            Foreground="#F44336"
+                            ToolTip="Panic"
+                            Click="Panic_Click" />
+                </ToolBar>
 
-				<ToolBar x:Name="toolbar_channels"  Style="{DynamicResource MaterialDesignToolBar}"
-	ClipToBounds="False" HorizontalAlignment="Center" Visibility="Collapsed">
+                <ToolBar x:Name="toolbar_channels"
+                         Style="{DynamicResource MaterialDesignToolBar}"
+                         ClipToBounds="False"
+                         HorizontalAlignment="Center"
+                         Visibility="Collapsed">
 
-					<ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Playout Channel" x:Name="playoutChannel"/>
-					<ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="CG Channel" x:Name="cgChannel"/>
-					<ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}" materialDesign:HintAssist.Hint="Preview Channel" x:Name="previewChannel"/>
+                    <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Playout Channel"
+                              x:Name="playoutChannel" />
+                    <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="CG Channel"
+                              x:Name="cgChannel" />
+                    <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.Hint="Preview Channel"
+                              x:Name="previewChannel" />
 
-				</ToolBar>
+                </ToolBar>
 
-				<ToolBar  Style="{DynamicResource MaterialDesignToolBar}"
-	ClipToBounds="False" HorizontalAlignment="Center">
-					<Label x:Name="statusText" Content="Ready to connect" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="500"></Label>
-				</ToolBar>
-			</ToolBarTray>
-		</Grid>
-	</materialDesign:DialogHost>
+                <ToolBar  Style="{DynamicResource MaterialDesignToolBar}"
+                          ClipToBounds="False"
+                          HorizontalAlignment="Center">
+                    <Label x:Name="statusText"
+                           Content="Ready to connect"
+                           VerticalAlignment="Center"
+                           VerticalContentAlignment="Center"
+                           Width="500"></Label>
+                </ToolBar>
+            </ToolBarTray>
+        </Grid>
+    </materialDesign:DialogHost>
 </Window>
