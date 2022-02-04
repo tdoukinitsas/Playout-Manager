@@ -22,9 +22,7 @@ using System.IO;
 using Microsoft.Win32;
 using System.Xml;
 using System.Timers;
-
-
-
+using System.Reflection;
 
 namespace Playout_Manager
 {
@@ -110,6 +108,8 @@ namespace Playout_Manager
             col10.Header = "CG Field 0";
             col11.Header = "CG Field 1";
             col12.Header = "Extra AMCP Command";
+
+            versionNumber.Content = "v" + Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             //start the clock
             SetTimer();

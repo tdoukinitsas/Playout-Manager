@@ -17,7 +17,11 @@
         Title="Playout Manager"
         Height="450"
         Width="800"
-        Icon="Icon1.ico">
+        Icon="Icon1.ico"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        MinWidth="640"
+        MinHeight="450">
     <materialDesign:DialogHost CloseOnClickAway="True"
                                DialogTheme="Inherit">
         <Grid>
@@ -95,8 +99,13 @@
                                 </StackPanel>
                             </MenuItem.CommandParameter>
                         </MenuItem>
+                        
                     </MenuItem>
+                    <Label x:Name="versionNumber" 
+                        Content="v0.0"
+                           Foreground="#19FFFFFF" />
                 </Menu>
+                
                 <Image x:Name="Logo"
                        Source="Icon1.ico"
                        Grid.Column="1"
