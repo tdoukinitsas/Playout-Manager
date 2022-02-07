@@ -110,6 +110,7 @@ namespace Playout_Manager
             col12.Header = "Extra AMCP Command";
 
             versionNumber.Content = "v" + Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            about_version.Text = "v" + Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             //start the clock
             SetTimer();
@@ -542,8 +543,8 @@ namespace Playout_Manager
             //get the date and time (still needs fixing to be able to auto calculate offset from previous clip)
             DateTime StartTime = DateTime.Now;
             if (add_StartTime.SelectedTime != null)
-            { 
-            StartTime = add_StartTime.SelectedTime.Value;
+            {
+                StartTime = add_StartTime.SelectedTime.Value;
             }
 
             //declare all the clip variables and set them to something blank
@@ -600,6 +601,7 @@ namespace Playout_Manager
             if (saveFileDialog.ShowDialog() == true)
             {
                 File.WriteAllText(saveFileDialog.FileName, DataGridToString());
+                this.Title = "Playout Manager - " + saveFileDialog.FileName;
             }
         }
 
@@ -639,6 +641,7 @@ namespace Playout_Manager
             if (openFileDialog.ShowDialog() == true)
             {
                 string loadString = File.ReadAllText(openFileDialog.FileName);
+                this.Title = "Playout Manager - " + openFileDialog.FileName;
                 StringToDataGrid(loadString);
             }
 
@@ -747,6 +750,8 @@ namespace Playout_Manager
             aTimer.Elapsed += OnTimedEvent;
             aTimer.AutoReset = true;
             aTimer.Enabled = true;
+
+
         }
 
         //takes a DataItem and returns the duration as a timespan
@@ -755,6 +760,19 @@ namespace Playout_Manager
             int DurSeconds = selectedItem.Duration / selectedItem.Framerate;
             return TimeSpan.FromSeconds(DurSeconds);
         }
+
+
+
+
+        
+
+
+
+
+
+
+
+
 
         //this method happens every second
         public void OnTimedEvent(Object source, ElapsedEventArgs e)
@@ -850,7 +868,7 @@ namespace Playout_Manager
                             TimeSpan mediaDurationTimespan = TimeSpan.FromSeconds(currentItem.Duration / currentItem.Framerate);
                             TimeSpan endTimeSpan = startTimeSpan + mediaDurationTimespan;
 
-                            
+
 
                             DurationBar.IsIndeterminate = false;
 
@@ -873,14 +891,26 @@ namespace Playout_Manager
                             SolidColorBrush redBrush = new SolidColorBrush(redCol);
                             SolidColorBrush orangeBrush = new SolidColorBrush(orangeCol);
 
-                            if (secsToEnd < 5) { DurationBar.Foreground = redBrush; }
-                            else if (secsToEnd < 10) { DurationBar.Foreground = orangeBrush; }
-                            else { DurationBar.Foreground = greenBrush; }
+                            if (secsToEnd < 5)
+                            {
+                                DurationBar.Foreground = redBrush;
+                                indicator_clipend.Background = redBrush;
+                            }
+                            else if (secsToEnd < 10)
+                            {
+                                DurationBar.Foreground = orangeBrush;
+                                indicator_clipend.Background = orangeBrush;
+                            }
+                            else
+                            {
+                                DurationBar.Foreground = greenBrush;
+                                indicator_clipend.Background = greenBrush;
+                            }
 
                             Status("ON AIR", 1);
                         }
                         else
-                        { 
+                        {
                             DurationBar.IsIndeterminate = true;
                             Status("ITEM NOT IN RUNDOWN PLAYING ON SERVER", 2);
                         }
@@ -968,6 +998,7 @@ namespace Playout_Manager
 
         private void editTime_update_Click(object sender, RoutedEventArgs e)
         {
+
             int index = 0;
             int selected = MainGrid.SelectedIndex;
             string stringBuilder = "";
@@ -978,12 +1009,7 @@ namespace Playout_Manager
 
                 if (index == MainGrid.SelectedIndex)
                 {
-                    DateTime StartTime = DateTime.Now;
-                    if (add_StartTime.SelectedTime != null)
-                    {
-                        StartTime = editTime_StartTime.SelectedTime.Value;
-                    }
-
+                    DateTime StartTime = editTime_StartTime.SelectedTime.Value;
                     item.StartTime = StartTime;
                 }
 
@@ -1050,6 +1076,139 @@ namespace Playout_Manager
             int cg = GetChannel("cg");
             _Caspar.Execute("CLEAR " + playout);
             _Caspar.Execute("CLEAR " + cg);
+        }
+
+        private void Edit_Click(object sender, RoutedEventArgs e)
+        {
+
+            //Find the selected item and turn in in to a DataItem called currentItem
+            DataItem currentItem = new DataItem();
+            int index = 0;
+            int selected = MainGrid.SelectedIndex;
+            add_Refresh.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            add_RefreshTemplates.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            foreach (var item in MainGrid.Items.OfType<DataItem>())
+            {
+
+                if (index == MainGrid.SelectedIndex)
+                {
+                    currentItem = item;
+                    Log("Editing Item " + currentItem.Name);
+                }
+
+                index = index + 1;
+            }
+
+            //now take all the data from the item and assign it to the fields in our form, ready to edit.
+            add_StartDate.SelectedDate = currentItem.StartTime;
+            add_StartTime.SelectedTime = currentItem.StartTime;
+            add_mediaSelector.SelectedItem = currentItem.Name;
+            add_f_in.Content = Convert.ToInt32(currentItem.FrameIn);
+            add_f_out.Content = Convert.ToInt32(currentItem.FrameIn) + Convert.ToInt32(currentItem.Duration);
+            add_f_dur.Content = Convert.ToInt32(currentItem.Duration);
+            add_f_framerate.Content = Convert.ToInt32(currentItem.Framerate);
+            add_TemplateList.SelectedItem = currentItem.CG;
+            add_CGlayer.Text = currentItem.CGlayer.ToString();
+            add_CGdelayInSeconds.Text = currentItem.CGdelay.ToString();
+            add_CGf0.Text = currentItem.CGfield0;
+            add_CGf1.Text = currentItem.CGfield1;
+            add_commands.Text = currentItem.Command;
+
+            if (currentItem.EndAction == "hold")
+            {
+                add_Hold.IsChecked = true;
+            }
+            else if (currentItem.EndAction == "black")
+            {
+                add_Black.IsChecked = true;
+            }
+            else if (currentItem.EndAction == "loop")
+            {
+                add_Loop.IsChecked = true;
+            }
+
+            Add.Command.Execute(Add.CommandParameter);
+        }
+
+        private void add_UpdateSelected_Click(object sender, RoutedEventArgs e)
+        {
+            int index = 0;
+            int selected = MainGrid.SelectedIndex;
+            string stringBuilder = "";
+
+            foreach (var item in MainGrid.Items.OfType<DataItem>())
+            {
+
+
+                if (index == MainGrid.SelectedIndex)
+                {
+                    if (add_mediaSelector.SelectedItem != null)
+                    {
+                        item.StartTime = (DateTime)add_StartTime.SelectedTime;
+                        item.Name = add_mediaSelector.SelectedItem.ToString();
+                        item.FrameIn = Convert.ToInt32(add_f_in.Content);
+                        item.Framerate = Convert.ToInt32(add_f_framerate.Content);
+                        item.Duration = Convert.ToInt32(add_f_dur.Content);
+                        if (add_Hold.IsChecked == true)
+                        { item.EndAction = "hold"; }
+                        else if (add_Black.IsChecked == true)
+                        { item.EndAction = "black"; }
+                        else if (add_Loop.IsChecked == true)
+                        { item.EndAction = "loop"; }
+                    }
+                    if (add_TemplateList.SelectedItem != null)
+                    {
+                        item.CG = add_TemplateList.SelectedItem.ToString();
+                        item.CGlayer = Convert.ToInt32(add_CGlayer.Text);
+                        item.CGdelay = Convert.ToInt32(add_CGdelayInSeconds.Text);
+                        item.CGfield0 = add_CGf0.Text;
+                        item.CGfield1 = add_CGf1.Text;
+                    }
+                    item.Command = add_commands.Text;
+
+
+                }
+
+                string itemEncoded = item.StartTime + "," + item.Name + "," + item.FrameIn + "," + item.Framerate + "," + item.EndAction + "," + item.Duration + "," + item.CG + "," + item.CGlayer + "," + item.CGdelay + "," + item.CGfield0 + "," + item.CGfield1 + "," + item.Command;
+                stringBuilder = stringBuilder + itemEncoded + "¬";
+
+                index = index + 1;
+
+            }
+
+            MainGrid.Items.Clear();
+            String[] line = stringBuilder.Split('¬');
+            foreach (string item in line)
+            {
+                if (item != "")
+                {
+                    string[] property = item.Split(',');
+                    AddItem(DateTime.Parse(property[0]), property[1], Convert.ToInt32(property[2]), Convert.ToInt32(property[3]), property[4], Convert.ToInt32(property[5]), property[6], Convert.ToInt32(property[7]), Convert.ToInt32(property[8]), property[9], property[10], property[11]);
+                }
+            }
+
+
+        }
+
+        private void about_visit_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/tdoukinitsas/Playout-Manager");
+        }
+
+        private void about_licence_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/tdoukinitsas/Playout-Manager/blob/master/LICENSE");
+        
+        }
+
+        private void about_feedback_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("mailto:thomas@creativityfilms.gr");
+        }
+
+        private void about_developer_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://www.doukinitsas.info");
         }
     }
 }
