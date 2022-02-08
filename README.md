@@ -11,12 +11,31 @@ However it has been tested with running a playlist for 12 hours and worked fine.
 Feel free to suggest edits or code on top of this, just send me an email at thomas@creativityfilms.gr
 
 # Quick start guide
+
+## Downloading
+Playout Manager currently does not need to be installed and can run as a portable app.
+
+Download and from the pre-built binaries found here:
+https://github.com/tdoukinitsas/Playout-Manager/releases
+
+Alternatively you can build your own version using Visual Studio 2019 with C# and WPF modules installed
+
+You will need the following NuGet packages to open the project in Visual Studio:
+- MaterialDesignThemes (UI Theme)
+- MaterialDesignColors (UI Theme)
+- gong-wpf-dragdrop (for enabling drag and drop functionality on the rundown)
+- Microsoft.Office.Interop.Excel (this is for planned future integration with spreadsheets)
+
+## Start the server
+You'll need a build of CasparCG server:
+https://github.com/CasparCG/server
+
+Before connecting to a server make sure that you have both the casparcg.exe server running, but also the scanner.exe application running.
+
 ## Connecting to the server
 When opening the application you will be greeted with the main screen
 
 ![image](https://user-images.githubusercontent.com/73527278/152435177-67a861cf-1aa5-4261-b3b3-35a9418d4f8d.png)
-
-Before connecting to a server make sure that you have both the casparcg.exe server running, but also the scanner.exe application running.
 
 In the bottom right corner type in the IP address of the server (or use localhost if the server is on the same machine) and click the Connect icon.
 If you've connected sucessfully the icon will go green and the main controls will appear, otherwise the connect icon will turn red and an error will be displayed in the status bar
