@@ -10,6 +10,10 @@ However it has been tested with running a playlist for 12 hours and worked fine.
 
 Feel free to suggest edits or code on top of this, just send me an email at thomas@creativityfilms.gr
 
+# Issues
+There are still some bugs and features that don't work, for further reference visit the issues page:
+https://github.com/tdoukinitsas/Playout-Manager/issues
+
 # Quick start guide
 
 ## Downloading
