@@ -34,6 +34,9 @@ You will need the following NuGet packages to open the project in Visual Studio:
 You'll need a build of CasparCG server:
 https://github.com/CasparCG/server
 
+This has been tested with v2.3.3 LTS
+https://github.com/CasparCG/server/releases/tag/v2.3.3-lts-stable
+
 Before connecting to a server make sure that you have both the casparcg.exe server running, but also the scanner.exe application running.
 
 ## Connecting to the server
