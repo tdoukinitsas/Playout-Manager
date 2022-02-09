@@ -1,4 +1,6 @@
 # Playout Manager
+![PLAYOUTMANAGER-ID_1_1](https://user-images.githubusercontent.com/73527278/153185981-6e4e6d6a-10e2-4880-aedb-533a50afc327.gif)
+
 Caspar CG Client with Scheduling Capabilities
 
 ![image](https://user-images.githubusercontent.com/73527278/152359130-13aeff93-137b-4491-881f-be1e4ebdd28d.png)
