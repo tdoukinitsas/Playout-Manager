@@ -23,6 +23,7 @@ using Microsoft.Win32;
 using System.Xml;
 using System.Timers;
 using System.Reflection;
+using System.Globalization;
 
 namespace Playout_Manager
 {
@@ -541,10 +542,15 @@ namespace Playout_Manager
         {
 
             //get the date and time (still needs fixing to be able to auto calculate offset from previous clip)
+            String startDateString = add_StartDate.SelectedDate.Value.ToString(@"ddMMyy"); ;
+            String startTimeString = add_StartTime.SelectedTime.Value.ToString(@"hhmmss"); ;
+            String startDateTimeString = startDateString + startTimeString;
+
+            CultureInfo provider = CultureInfo.InvariantCulture;
             DateTime StartTime = DateTime.Now;
-            if (add_StartTime.SelectedTime != null)
+            if (startDateTimeString != "")
             {
-                StartTime = add_StartTime.SelectedTime.Value;
+                StartTime = DateTime.ParseExact(startDateTimeString,"ddMMyyhhmmss",provider);
             }
 
             //declare all the clip variables and set them to something blank
@@ -782,6 +788,19 @@ namespace Playout_Manager
 
                 this.Dispatcher.Invoke(() =>
                 {
+
+
+
+                    //This sets up some colours
+                    Color greenCol = (Color)ColorConverter.ConvertFromString("#FF8BC34A");
+                    Color redCol = (Color)ColorConverter.ConvertFromString("#F44336");
+                    Color orangeCol = (Color)ColorConverter.ConvertFromString("#FFFF9800");
+                    Color noCol = (Color)ColorConverter.ConvertFromString("#00FFFFFF");
+                    SolidColorBrush greenBrush = new SolidColorBrush(greenCol);
+                    SolidColorBrush redBrush = new SolidColorBrush(redCol);
+                    SolidColorBrush orangeBrush = new SolidColorBrush(orangeCol);
+                    SolidColorBrush noBrush = new SolidColorBrush(noCol);
+
                     //Check DataGrid for items
                     //If item time matches event time, trigger it
 
@@ -848,15 +867,31 @@ namespace Playout_Manager
 
                         DataItem currentItem = new DataItem();
 
+                        int index = 0;
+                        bool currentHasBeenFound = false;
+
                         //Go through the list
                         foreach (var playItem in MainGrid.Items.OfType<DataItem>())
                         {
+
+                            DataGridRow currentRow = MainGrid.ItemContainerGenerator.ContainerFromItem(MainGrid.Items[index]) as DataGridRow;
+                            DataGridRow nextRow = MainGrid.ItemContainerGenerator.ContainerFromItem(MainGrid.Items[index+1]) as DataGridRow;
+                            currentRow.Background = noBrush;
+
                             //if the item currently playing on the caspar server is the same as this item in the list
                             if (currentMediaPath.Contains(playItem.Name))
                             {
                                 //assign the item to our current item
                                 currentItem = playItem;
+                                //if (currentHasBeenFound == false) { 
+                                currentRow.Background = redBrush;
+                                nextRow.Background = greenBrush;
+                                //}
+                                currentHasBeenFound = true;
                             }
+
+
+                            index = index + 1;
                         }
 
 
@@ -883,13 +918,7 @@ namespace Playout_Manager
                             timecode_next.Content = TimeSpan.FromSeconds(secsToEnd).ToString(@"hh\:mm\:ss");
 
 
-                            //This sets up some colours
-                            Color greenCol = (Color)ColorConverter.ConvertFromString("#FF8BC34A");
-                            Color redCol = (Color)ColorConverter.ConvertFromString("#F44336");
-                            Color orangeCol = (Color)ColorConverter.ConvertFromString("#FFFF9800");
-                            SolidColorBrush greenBrush = new SolidColorBrush(greenCol);
-                            SolidColorBrush redBrush = new SolidColorBrush(redCol);
-                            SolidColorBrush orangeBrush = new SolidColorBrush(orangeCol);
+                            
 
                             if (secsToEnd < 5)
                             {
@@ -931,6 +960,20 @@ namespace Playout_Manager
             }
 
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         public void AutoScheduleFromSelectedItem()
         {
@@ -1003,13 +1046,24 @@ namespace Playout_Manager
             int selected = MainGrid.SelectedIndex;
             string stringBuilder = "";
 
+            //get the date and time (still needs fixing to be able to auto calculate offset from previous clip)
+            String startDateString = editTime_StartDate.SelectedDate.Value.ToString(@"ddMMyy"); ;
+            String startTimeString = editTime_StartTime.SelectedTime.Value.ToString(@"hhmmss"); ;
+            String startDateTimeString = startDateString + startTimeString;
+
+            CultureInfo provider = CultureInfo.InvariantCulture;
+            DateTime StartTime = DateTime.Now;
+            if (startDateTimeString != "")
+            {
+                StartTime = DateTime.ParseExact(startDateTimeString, "ddMMyyhhmmss", provider);
+            }
+
             foreach (var item in MainGrid.Items.OfType<DataItem>())
             {
 
 
                 if (index == MainGrid.SelectedIndex)
                 {
-                    DateTime StartTime = editTime_StartTime.SelectedTime.Value;
                     item.StartTime = StartTime;
                 }
 
@@ -1136,6 +1190,18 @@ namespace Playout_Manager
             int selected = MainGrid.SelectedIndex;
             string stringBuilder = "";
 
+            //get the date and time (still needs fixing to be able to auto calculate offset from previous clip)
+            String startDateString = add_StartDate.SelectedDate.Value.ToString(@"ddMMyy"); ;
+            String startTimeString = add_StartTime.SelectedTime.Value.ToString(@"hhmmss"); ;
+            String startDateTimeString = startDateString + startTimeString;
+
+            CultureInfo provider = CultureInfo.InvariantCulture;
+            DateTime StartTime = DateTime.Now;
+            if (startDateTimeString != "")
+            {
+                StartTime = DateTime.ParseExact(startDateTimeString, "ddMMyyhhmmss", provider);
+            }
+
             foreach (var item in MainGrid.Items.OfType<DataItem>())
             {
 
@@ -1144,7 +1210,7 @@ namespace Playout_Manager
                 {
                     if (add_mediaSelector.SelectedItem != null)
                     {
-                        item.StartTime = (DateTime)add_StartTime.SelectedTime;
+                        item.StartTime = StartTime;
                         item.Name = add_mediaSelector.SelectedItem.ToString();
                         item.FrameIn = Convert.ToInt32(add_f_in.Content);
                         item.Framerate = Convert.ToInt32(add_f_framerate.Content);
