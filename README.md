@@ -146,3 +146,13 @@ You will need the following NuGet packages to open the project in Visual Studio:
 - MaterialDesignColors (UI Theme)
 - gong-wpf-dragdrop (for enabling drag and drop functionality on the rundown)
 - Microsoft.Office.Interop.Excel (this is for planned future integration with spreadsheets)
+
+## UI / Style
+Playout manager uses Material Design as it's design system
+https://material.io/design
+
+The user interface should adhere to that style.
+
+The UI should be easy to navigate and use, and should adhere to human interface guidelines.
+
+The Material Colours used are Orange 500, Light Green 500, Red 500 and Amber 500 as a highlight. Also the UI uses dark mode as it will be most likely be used in darker and low light environments (like broadcast galleries and contol rooms)
