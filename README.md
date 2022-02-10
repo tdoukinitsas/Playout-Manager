@@ -19,6 +19,9 @@ https://github.com/tdoukinitsas/Playout-Manager/issues
 
 # Quick start guide
 
+## Demo Video
+https://user-images.githubusercontent.com/73527278/153314035-a7c21f0d-5d75-4230-871c-eaeb26f49550.mp4
+
 ## Downloading
 Playout Manager currently does not need to be installed and can run as a portable app.
 
