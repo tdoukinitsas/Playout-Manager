@@ -24,6 +24,7 @@ using System.Xml;
 using System.Timers;
 using System.Reflection;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace Playout_Manager
 {
@@ -868,29 +869,34 @@ namespace Playout_Manager
                         DataItem currentItem = new DataItem();
 
                         int index = 0;
-                        bool currentHasBeenFound = false;
+                        //bool currentHasBeenFound = false;
 
                         //Go through the list
                         foreach (var playItem in MainGrid.Items.OfType<DataItem>())
                         {
-
+                            //get the current row and turn it in to currentRow
                             DataGridRow currentRow = MainGrid.ItemContainerGenerator.ContainerFromItem(MainGrid.Items[index]) as DataGridRow;
-                            DataGridRow nextRow = MainGrid.ItemContainerGenerator.ContainerFromItem(MainGrid.Items[index+1]) as DataGridRow;
-                            currentRow.Background = noBrush;
+                            
+                            //this if statement is here because sometimes currentRow can be null
+                            if (currentRow != null)
+                            {
+                                currentRow.Background = noBrush;
+                            }
 
                             //if the item currently playing on the caspar server is the same as this item in the list
                             if (currentMediaPath.Contains(playItem.Name))
                             {
                                 //assign the item to our current item
                                 currentItem = playItem;
+
+                                //this still needs fixing
                                 //if (currentHasBeenFound == false) { 
                                 currentRow.Background = redBrush;
-                                nextRow.Background = greenBrush;
                                 //}
-                                currentHasBeenFound = true;
+                                //currentHasBeenFound = true;
                             }
 
-
+                            //increment the index
                             index = index + 1;
                         }
 
@@ -904,7 +910,7 @@ namespace Playout_Manager
                             TimeSpan endTimeSpan = startTimeSpan + mediaDurationTimespan;
 
 
-
+                            //we know the progress so set the progress bar to not be indeterminate
                             DurationBar.IsIndeterminate = false;
 
                             //figure out how the playing bar should work
@@ -951,7 +957,11 @@ namespace Playout_Manager
                     }
                     catch (Exception xmlerr)
                     {
-                        Log("Couldn't get server data because " + xmlerr.Message);
+
+                        var st = new StackTrace(xmlerr, true);
+                        var frame = st.GetFrame(0);
+                        var line = frame.GetFileLineNumber();
+                        Log("Error at line "+line+":Couldn't get server data because " + xmlerr.Message);
                     }
 
 
