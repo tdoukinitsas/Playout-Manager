@@ -36,6 +36,9 @@ You will need the following NuGet packages to open the project in Visual Studio:
 - gong-wpf-dragdrop (for enabling drag and drop functionality on the rundown)
 - Microsoft.Office.Interop.Excel (this is for planned future integration with spreadsheets)
 
+also you'll need to download CasparObjects, which is the main library used to connect to casparCG:
+https://github.com/didikunz/CasparObjects
+
 ## Start the server
 You'll need a build of CasparCG server:
 https://github.com/CasparCG/server
@@ -150,6 +153,9 @@ You will need the following NuGet packages to open the project in Visual Studio:
 - MaterialDesignColors (UI Theme)
 - gong-wpf-dragdrop (for enabling drag and drop functionality on the rundown)
 - Microsoft.Office.Interop.Excel (this is for planned future integration with spreadsheets)
+
+also you'll need to download CasparObjects, which is the main library used to connect to casparCG:
+https://github.com/didikunz/CasparObjects
 
 ## UI / Style
 Playout manager uses Material Design as it's design system
