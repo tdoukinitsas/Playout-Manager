@@ -1082,14 +1082,14 @@ namespace Playout_Manager
 
             //get the date and time (still needs fixing to be able to auto calculate offset from previous clip)
             String startDateString = editTime_StartDate.SelectedDate.Value.ToString(@"ddMMyy"); ;
-            String startTimeString = editTime_StartTime.SelectedTime.Value.ToString(@"hhmmss"); ;
+            String startTimeString = editTime_StartTime.SelectedTime.Value.ToString(@"HHmmss"); ;
             String startDateTimeString = startDateString + startTimeString;
 
             CultureInfo provider = CultureInfo.InvariantCulture;
             DateTime StartTime = DateTime.Now;
             if (startDateTimeString != "")
             {
-                StartTime = DateTime.ParseExact(startDateTimeString, "ddMMyyhhmmss", provider);
+                StartTime = DateTime.ParseExact(startDateTimeString, "ddMMyyHHmmss", provider);
             }
 
             foreach (var item in MainGrid.Items.OfType<DataItem>())
