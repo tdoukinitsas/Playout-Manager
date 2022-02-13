@@ -687,8 +687,7 @@
                     <Label x:Name="statusText"
                            Content="Ready to connect"
                            VerticalAlignment="Center"
-                           VerticalContentAlignment="Center"
-                           Width="500"></Label>
+                           VerticalContentAlignment="Center" />
                 </ToolBar>
             </ToolBarTray>
         </Grid>

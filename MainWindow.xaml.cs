@@ -231,9 +231,21 @@ namespace Playout_Manager
             }
         }
 
-        public void Log(string message)
+        public void Log(string message, string errType)
         {
-            statusText.Content = message;
+            //This sets up some colours
+            Color sucessCol = (Color)ColorConverter.ConvertFromString("#FF8BC34A");
+            Color errorCol = (Color)ColorConverter.ConvertFromString("#F44336");
+            Color defaultCol = (Color)ColorConverter.ConvertFromString("#FF424242");
+            SolidColorBrush successBrush = new SolidColorBrush(sucessCol);
+            SolidColorBrush errorBrush = new SolidColorBrush(errorCol);
+            SolidColorBrush defaultBrush = new SolidColorBrush(defaultCol);
+
+            //prints out error
+            statusText.Content = "["+errType+"] at " + DateTime.Now + ": " + message;
+            if (errType == "error") { statusText.Foreground = errorBrush; }
+            else if (errType == "warning" ) { statusText.Foreground = defaultBrush;  }
+            else { statusText.Foreground = successBrush; }
             Console.WriteLine(message);
         }
 
@@ -265,15 +277,15 @@ namespace Playout_Manager
                 toolbar_transportcontrols.Visibility = Visibility.Visible;
                 toolbar_channels.Visibility = Visibility.Visible;
 
-                try { GetChannels(); } catch (Exception errChannels) { Log("Couldn't get channel list because " + errChannels); }
+                try { GetChannels(); } catch (Exception errChannels) { Log("Couldn't get channel list because " + errChannels, "error"); }
 
-                Log("Connected to CasparCG Server " + ipbox.Text);
+                Log("Connected to CasparCG Server " + ipbox.Text,"info");
                 Status("CONNECTED", 0);
             }
             else
             {
                 Connect.Foreground = errorBrush;
-                Log("Error connecting to server");
+                Log("Error connecting to server", "error");
                 Status("ERROR CONNECTING TO SERVER", 0);
             }
         }
@@ -367,11 +379,11 @@ namespace Playout_Manager
                     add_Duration.Text = duration.ToString(@"hh\:mm\:ss");
                     add_Out.Text = duration.ToString(@"hh\:mm\:ss");
 
-                    Log("Retrieved media duration for " + currentclip);
+                    Log("Retrieved media duration for " + currentclip, "info");
                 }
                 catch (Exception err)
                 {
-                    Log("Couldn't calculate duration because " + err.Message);
+                    Log("Couldn't calculate duration because " + err.Message, "error");
                 }
 
                 //also let's set the starting date and time to the correct value
@@ -382,7 +394,7 @@ namespace Playout_Manager
             }
             else
             {
-                Log("Failed to get media duration information.");
+                Log("Failed to get media duration information.", "error");
             }
 
 
@@ -428,7 +440,7 @@ namespace Playout_Manager
             }
             catch (Exception inExep)
             {
-                Log("Couldn't update the in slider because " + inExep);
+                Log("Couldn't update the in slider because " + inExep, "warning");
             }
         }
 
@@ -470,7 +482,7 @@ namespace Playout_Manager
             }
             catch (Exception inExep)
             {
-                Log("Couldn't update the out slider because " + inExep);
+                Log("Couldn't update the out slider because " + inExep, "warning");
             }
         }
 
@@ -679,7 +691,7 @@ namespace Playout_Manager
                 }
                 catch (Exception playErr)
                 {
-                    Log(playErr.Message);
+                    Log(playErr.Message, "error");
                     Status("ERROR PLAYING MEDIA", 0);
                 }
 
@@ -702,7 +714,7 @@ namespace Playout_Manager
                     _Caspar.CG_Add(cgChannel, cgLayer, CG, previewTemplate, true, cgDelayRetard);
                 }
                 catch (Exception cgErr)
-                { Log(cgErr.Message); }
+                { Log(cgErr.Message, "error"); }
 
             }
 
@@ -722,9 +734,13 @@ namespace Playout_Manager
 
         private void PlaySelected_Click(object sender, RoutedEventArgs e)
         {
+             
             DataItem playItem = MainGrid.SelectedItem as DataItem;
+            if (playItem != null)
+            {
             label_current.Content = "NOW PLAYING: " + playItem.Name;
             PlayItem(playItem.Name, playItem.FrameIn, playItem.Framerate, playItem.EndAction, playItem.Duration, playItem.CG, playItem.CGlayer, playItem.CGdelay, playItem.CGfield0, playItem.CGfield1, playItem.Command);
+            }
         }
 
         private void CommandCGStop_Click(object sender, RoutedEventArgs e)
@@ -808,29 +824,36 @@ namespace Playout_Manager
                     label_date.Content = DateTime.Now.ToString(@"d");
                     label_time.Content = DateTime.Now.ToString(@"T");
 
+                    //if there's items in our list
                     if (MainGrid.Items != null)
                     {
-
+                        //for every item
                         foreach (var playItem in MainGrid.Items.OfType<DataItem>())
                         {
-                            string start = playItem.StartTime.ToString(@"ddMMyyhhmmss");
-                            string now = e.SignalTime.ToString(@"ddMMyyhhmmss");
+                            //start is the item's start time, now is the time now
+                            string start = playItem.StartTime.ToString(@"ddMMyyHHmmss");
+                            string now = e.SignalTime.ToString(@"ddMMyyHHmmss");
 
+                            //if the start time of the item is now then play the item
                             if (start == now)
                             {
                                 label_current.Content = "NOW PLAYING: " + playItem.Name;
                                 PlayItem(playItem.Name, playItem.FrameIn, playItem.Framerate, playItem.EndAction, playItem.Duration, playItem.CG, playItem.CGlayer, playItem.CGdelay, playItem.CGfield0, playItem.CGfield1, playItem.Command);
-                                Log(playItem.Name + " has started playing at " + e.SignalTime);
+                                Log(playItem.Name + " has started playing at " + e.SignalTime, "info");
                             }
                         }
                     }
-                    else { Log("Datagrid Empty, not scanning items at " + e.SignalTime); }
+                    else { Log("Datagrid Empty, not scanning items at " + e.SignalTime, "info"); }
 
                     //Get the current status of the caspar engine
 
                     try
                     {
-                        ReturnInfo info = _Caspar.Execute("INFO 1-10");
+                        //ask the engine to send the info on channel, 10 is the default media layer
+                        int playoutChannel = GetChannel("playout");
+                        ReturnInfo info = _Caspar.Execute("INFO " + playoutChannel + "-10");
+
+                        //what gets returned in an xml. Because this for some reason isn't always in the correct xml format we have to do some trickery
                         XmlDocument infoxml = new XmlDocument();
                         string xmlString = info.Data.Replace("<?xml version=\"1.0\" encoding=\"utf-8\"?>", "");
                         string[] xmlSplit = xmlString.Split(new string[] { "</channel>" }, StringSplitOptions.None);
@@ -838,6 +861,7 @@ namespace Playout_Manager
                         infoxml.RemoveAll();
                         infoxml.LoadXml("<xmlroot>" + xmlString + "</xmlroot>");
 
+                        //find the clip's name and time elements within the xml
                         XmlNodeList pathList = infoxml.GetElementsByTagName("name");
                         XmlNodeList timeList = infoxml.GetElementsByTagName("time");
 
@@ -890,9 +914,9 @@ namespace Playout_Manager
                                 currentItem = playItem;
 
                                 //this still needs fixing
-                                //if (currentHasBeenFound == false) { 
+                                if (currentRow != null) { 
                                 currentRow.Background = redBrush;
-                                //}
+                                }
                                 //currentHasBeenFound = true;
                             }
 
@@ -961,7 +985,7 @@ namespace Playout_Manager
                         var st = new StackTrace(xmlerr, true);
                         var frame = st.GetFrame(0);
                         var line = frame.GetFileLineNumber();
-                        Log("Error at line "+line+":Couldn't get server data because " + xmlerr.Message);
+                        Log("Error at line "+line+":Couldn't get server data because " + xmlerr.Message, "warning");
                     }
 
 
@@ -1001,7 +1025,7 @@ namespace Playout_Manager
                 {
                     item.StartTime = previousStartTime.Add(previousDuration);
 
-                    Log("changed item " + index + " start time to auto");
+                    Log("changed item " + index + " start time to auto", "info");
                 }
 
                 string itemEncoded = item.StartTime + "," + item.Name + "," + item.FrameIn + "," + item.Framerate + "," + item.EndAction + "," + item.Duration + "," + item.CG + "," + item.CGlayer + "," + item.CGdelay + "," + item.CGfield0 + "," + item.CGfield1 + "," + item.Command;
@@ -1157,7 +1181,7 @@ namespace Playout_Manager
                 if (index == MainGrid.SelectedIndex)
                 {
                     currentItem = item;
-                    Log("Editing Item " + currentItem.Name);
+                    Log("Editing Item " + currentItem.Name, "info");
                 }
 
                 index = index + 1;
