@@ -21,7 +21,8 @@
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
         MinWidth="640"
-        MinHeight="450">
+        MinHeight="450"
+        Closing="QuitAppConfirm">
     
     <materialDesign:DialogHost CloseOnClickAway="True"
                                DialogTheme="Inherit">
@@ -33,6 +34,7 @@
                 <RowDefinition Height="30" />
                 <RowDefinition />
                 <RowDefinition Height="50" />
+                <RowDefinition Height="30" />
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -57,6 +59,7 @@
                                   InputGestureText="Ctrl+L"
                                   Click="LoadPlaylist_Click" />
                         <MenuItem Header="Exit"
+                                  x:Name="exitApplication"
                                   InputGestureText="Ctrl+E"
                                   Icon="{materialDesign:PackIcon Kind=ExitToApp}" />
                     </MenuItem>
@@ -79,6 +82,16 @@
                                   Icon="{materialDesign:PackIcon Kind=Fullscreen}"
                                   InputGestureText="F12"
                                   Click="ToggleFullscreen" />
+                        <MenuItem Header="_Light Theme"
+                                  x:Name="lightTheme"
+                                  Icon="{materialDesign:PackIcon Kind=ThemeOutline}"
+                                  InputGestureText=""
+                                  Click="lightTheme_Click" />
+                        <MenuItem Header="_Dark Theme"
+                                  x:Name="darkTheme"
+                                  Icon="{materialDesign:PackIcon Kind=Theme}"
+                                  InputGestureText=""
+                                  Click="darkTheme_Click" />
                     </MenuItem>
                     <MenuItem Header="_Help">
                         <MenuItem Header="_About"
@@ -607,7 +620,7 @@
                                         <ColumnDefinition></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                     <CheckBox x:Name="editTime_auto"
-                                        Content="Auto-calculate new start times for all items"
+                                              Content="Auto-calculate new start times for all items"
                                               Margin="10" />
                                     <Button Content="UPDATE SELECTED"
                                             x:Name="editTime_update"
@@ -635,27 +648,28 @@
                             ToolTip="Play"
                             x:Name="PlaySelected"
                             Click="PlaySelected_Click" />
+                    <Button x:Name="PlayNext"
+                            Content="{materialDesign:PackIcon Kind=NextTitle}"
+                            ToolTip="Play Next"
+                            Foreground="#FF8BC34A"
+                            Click="PlayNext_Click" />
                     <Button x:Name="AutoSchedule"
                             Content="{materialDesign:PackIcon Kind=Stopwatch}"
                             Foreground="#FF8BC34A"
                             ToolTip="Auto Shedule"
                             Click="AutoSchedule_Click" />
-                    <Button x:Name="Pause" 
-                        Content="{materialDesign:PackIcon Kind=Pause}"
+                    <Button x:Name="Pause"
+                            Content="{materialDesign:PackIcon Kind=Pause}"
                             ToolTip="Pause"
                             Click="Pause_Click" />
-                    <Button x:Name="Resume" 
-                        Content="{materialDesign:PackIcon Kind=PlayPause}"
+                    <Button x:Name="Resume"
+                            Content="{materialDesign:PackIcon Kind=PlayPause}"
                             ToolTip="Resume"
                             Click="Resume_Click" />
                     <Button x:Name="Stop"
                             Content="{materialDesign:PackIcon Kind=Stop}"
                             ToolTip="Stop"
                             Click="Stop_Click" />
-                    <Button x:Name="PlayNext"
-                        Content="{materialDesign:PackIcon Kind=NextTitle}"
-                            ToolTip="Play Next"
-                            Click="PlayNext_Click"/>
                     <Button x:Name="Panic"
                             Content="{materialDesign:PackIcon Kind=AlertOctagon}"
                             Foreground="#F44336"
@@ -663,6 +677,40 @@
                             Click="Panic_Click" />
                 </ToolBar>
 
+                <ToolBar x:Name="cg_Actions"
+                         Style="{DynamicResource MaterialDesignToolBar}"
+                         ClipToBounds="False"
+                         HorizontalAlignment="Center"
+                         Visibility="Collapsed">
+                    <Button x:Name="cgStop"
+                            Content="{materialDesign:PackIcon Kind=StopRemove}"
+                            Foreground="#FFFF9800"
+                            ToolTip="Takes Out the Current CG"
+                            Click="cgStop_Click" />
+                    <Button x:Name="cgUpdate"
+                            Content="{materialDesign:PackIcon Kind=Refresh}"
+                            Foreground="#FFFF9800"
+                            ToolTip="Update CG with new Text"
+                            Click="cgUpdate_Click" />
+                    <Button x:Name="cgUpdateWithSelected"
+                            Content="{materialDesign:PackIcon Kind=RefreshAutomatic}"
+                            Foreground="#FFFF9800"
+                            ToolTip="Update CG with Text from Selected Item"
+                            Click="cgUpdateWithSelected_Click" />
+                    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             x:Name="cgToolbar_layer"
+                             Text="20"
+                             materialDesign:HintAssist.Hint="CG Layer"
+                             Margin="10" />
+                    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             x:Name="cgToolbar_f0"
+                             materialDesign:HintAssist.Hint="Field 0"
+                             Margin="10" />
+                    <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             x:Name="cgToolbar_f1"
+                             materialDesign:HintAssist.Hint="Field 1"
+                             Margin="10" />
+                </ToolBar>
                 <ToolBar x:Name="toolbar_channels"
                          Style="{DynamicResource MaterialDesignToolBar}"
                          ClipToBounds="False"
@@ -671,16 +719,23 @@
 
                     <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                               materialDesign:HintAssist.Hint="Playout Channel"
-                              x:Name="playoutChannel" />
+                              x:Name="playoutChannel"
+                              VerticalAlignment="Center"
+                              Margin="10"/>
                     <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                               materialDesign:HintAssist.Hint="CG Channel"
-                              x:Name="cgChannel" />
+                              x:Name="cgChannel"
+                              VerticalAlignment="Center"
+                              Margin="10"/>
                     <ComboBox Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                               materialDesign:HintAssist.Hint="Preview Channel"
-                              x:Name="previewChannel" />
+                              x:Name="previewChannel"
+                              VerticalAlignment="Center"
+                              Margin="10" />
 
                 </ToolBar>
-
+            </ToolBarTray>
+            <ToolBarTray Grid.Row="6">
                 <ToolBar  Style="{DynamicResource MaterialDesignToolBar}"
                           ClipToBounds="False"
                           HorizontalAlignment="Center">

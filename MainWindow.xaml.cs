@@ -25,6 +25,7 @@ using System.Timers;
 using System.Reflection;
 using System.Globalization;
 using System.Diagnostics;
+using MaterialDesignThemes.Wpf;
 
 namespace Playout_Manager
 {
@@ -62,18 +63,18 @@ namespace Playout_Manager
         {
             //This sets up the main Data Grid List
             InitializeComponent();
-            DataGridTextColumn col1 = new DataGridTextColumn();
-            DataGridTextColumn col2 = new DataGridTextColumn();
-            DataGridTextColumn col3 = new DataGridTextColumn();
-            DataGridTextColumn col4 = new DataGridTextColumn();
-            DataGridTextColumn col5 = new DataGridTextColumn();
-            DataGridTextColumn col6 = new DataGridTextColumn();
-            DataGridTextColumn col7 = new DataGridTextColumn();
-            DataGridTextColumn col8 = new DataGridTextColumn();
-            DataGridTextColumn col9 = new DataGridTextColumn();
-            DataGridTextColumn col10 = new DataGridTextColumn();
-            DataGridTextColumn col11 = new DataGridTextColumn();
-            DataGridTextColumn col12 = new DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col1 = new System.Windows.Controls.DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col2 = new System.Windows.Controls.DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col3 = new System.Windows.Controls.DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col4 = new System.Windows.Controls.DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col5 = new System.Windows.Controls.DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col6 = new System.Windows.Controls.DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col7 = new System.Windows.Controls.DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col8 = new System.Windows.Controls.DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col9 = new System.Windows.Controls.DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col10 = new System.Windows.Controls.DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col11 = new System.Windows.Controls.DataGridTextColumn();
+            System.Windows.Controls.DataGridTextColumn col12 = new System.Windows.Controls.DataGridTextColumn();
             MainGrid.Columns.Add(col1);
             MainGrid.Columns.Add(col2);
             MainGrid.Columns.Add(col3);
@@ -236,15 +237,15 @@ namespace Playout_Manager
             //This sets up some colours
             Color sucessCol = (Color)ColorConverter.ConvertFromString("#FF8BC34A");
             Color errorCol = (Color)ColorConverter.ConvertFromString("#F44336");
-            Color defaultCol = (Color)ColorConverter.ConvertFromString("#FF424242");
+            Color defaultCol = (Color)ColorConverter.ConvertFromString("#FFFF9800");
             SolidColorBrush successBrush = new SolidColorBrush(sucessCol);
             SolidColorBrush errorBrush = new SolidColorBrush(errorCol);
             SolidColorBrush defaultBrush = new SolidColorBrush(defaultCol);
 
             //prints out error
-            statusText.Content = "["+errType+"] at " + DateTime.Now + ": " + message;
+            statusText.Content = "[" + errType + "] at " + DateTime.Now + ": " + message;
             if (errType == "error") { statusText.Foreground = errorBrush; }
-            else if (errType == "warning" ) { statusText.Foreground = defaultBrush;  }
+            else if (errType == "warning") { statusText.Foreground = defaultBrush; }
             else { statusText.Foreground = successBrush; }
             Console.WriteLine(message);
         }
@@ -276,10 +277,11 @@ namespace Playout_Manager
                 toolbar_addControls.Visibility = Visibility.Visible;
                 toolbar_transportcontrols.Visibility = Visibility.Visible;
                 toolbar_channels.Visibility = Visibility.Visible;
+                cg_Actions.Visibility = Visibility.Visible;
 
                 try { GetChannels(); } catch (Exception errChannels) { Log("Couldn't get channel list because " + errChannels, "error"); }
 
-                Log("Connected to CasparCG Server " + ipbox.Text,"info");
+                Log("Connected to CasparCG Server " + ipbox.Text, "info");
                 Status("CONNECTED", 0);
             }
             else
@@ -333,24 +335,25 @@ namespace Playout_Manager
 
             if (clipInfoString.Data != null)
             {
-
-                if (add_EnablePreview.IsChecked == true)
-                {
-                    _Caspar.Execute("LOAD 1-10 \"" + add_mediaSelector.SelectedItem + "\"");
-                }
-
-                //this removes the file name at the beginning as it may contains spaces and mess things up
-                int start = clipInfoString.Data.IndexOf("\"");
-                int end = clipInfoString.Data.LastIndexOf("\"");
-                clipInfoString.Data = clipInfoString.Data.Remove(start, end - start);
-
-                //now lets remove any other unessesary characters at the end of the data string
-                string input = clipInfoString.Data;
-                int index = input.IndexOf("\r\n");
-                clipInfoString.Data = input.Substring(0, index);
-
                 try
                 {
+
+                    if (add_EnablePreview.IsChecked == true)
+                    {
+                        _Caspar.Execute("LOAD 1-10 \"" + add_mediaSelector.SelectedItem + "\"");
+                    }
+
+                    //this removes the file name at the beginning as it may contains spaces and mess things up
+                    int start = clipInfoString.Data.IndexOf("\"");
+                    int end = clipInfoString.Data.LastIndexOf("\"");
+                    clipInfoString.Data = clipInfoString.Data.Remove(start, end - start);
+
+                    //now lets remove any other unessesary characters at the end of the data string
+                    string input = clipInfoString.Data;
+                    int index = input.IndexOf("\r\n");
+                    clipInfoString.Data = input.Substring(0, index);
+
+
                     //here we can finally take the frame number and divide it by the frame rate to get the seconds
                     string[] clipData = clipInfoString.Data.Split(' ');
                     string[] frameRate = clipData[7].Split('/');
@@ -563,7 +566,7 @@ namespace Playout_Manager
             DateTime StartTime = DateTime.Now;
             if (startDateTimeString != "")
             {
-                StartTime = DateTime.ParseExact(startDateTimeString,"ddMMyyhhmmss",provider);
+                StartTime = DateTime.ParseExact(startDateTimeString, "ddMMyyhhmmss", provider);
             }
 
             //declare all the clip variables and set them to something blank
@@ -688,6 +691,7 @@ namespace Playout_Manager
                     _Caspar.Execute("STOP 1-10");
                     _Caspar.Execute("LOAD 1-10 \"" + Name + "\"" + loopCommand + " SEEK " + Convert.ToInt32((frameIn * frameRatio)) + " LENGTH " + Convert.ToInt32((duration * frameRatio)));
                     _Caspar.Execute("PLAY 1-10");
+                    Log(Name + " has started playing", "info");
                 }
                 catch (Exception playErr)
                 {
@@ -734,12 +738,13 @@ namespace Playout_Manager
 
         private void PlaySelected_Click(object sender, RoutedEventArgs e)
         {
-             
+
             DataItem playItem = MainGrid.SelectedItem as DataItem;
             if (playItem != null)
             {
-            label_current.Content = "NOW PLAYING: " + playItem.Name;
-            PlayItem(playItem.Name, playItem.FrameIn, playItem.Framerate, playItem.EndAction, playItem.Duration, playItem.CG, playItem.CGlayer, playItem.CGdelay, playItem.CGfield0, playItem.CGfield1, playItem.Command);
+                label_current.Content = "NOW PLAYING: " + playItem.Name;
+                PlayItem(playItem.Name, playItem.FrameIn, playItem.Framerate, playItem.EndAction, playItem.Duration, playItem.CG, playItem.CGlayer, playItem.CGdelay, playItem.CGfield0, playItem.CGfield1, playItem.Command);
+
             }
         }
 
@@ -787,7 +792,7 @@ namespace Playout_Manager
 
 
 
-        
+
 
 
 
@@ -812,10 +817,16 @@ namespace Playout_Manager
                     Color greenCol = (Color)ColorConverter.ConvertFromString("#FF8BC34A");
                     Color redCol = (Color)ColorConverter.ConvertFromString("#F44336");
                     Color orangeCol = (Color)ColorConverter.ConvertFromString("#FFFF9800");
+                    Color dimgreenCol = (Color)ColorConverter.ConvertFromString("#558BC34A");
+                    Color dimredCol = (Color)ColorConverter.ConvertFromString("#55F44336");
+                    Color dimorangeCol = (Color)ColorConverter.ConvertFromString("#11FFFFFF");
                     Color noCol = (Color)ColorConverter.ConvertFromString("#00FFFFFF");
                     SolidColorBrush greenBrush = new SolidColorBrush(greenCol);
                     SolidColorBrush redBrush = new SolidColorBrush(redCol);
                     SolidColorBrush orangeBrush = new SolidColorBrush(orangeCol);
+                    SolidColorBrush dimgreenBrush = new SolidColorBrush(dimgreenCol);
+                    SolidColorBrush dimredBrush = new SolidColorBrush(dimredCol);
+                    SolidColorBrush dimorangeBrush = new SolidColorBrush(dimorangeCol);
                     SolidColorBrush noBrush = new SolidColorBrush(noCol);
 
                     //Check DataGrid for items
@@ -839,7 +850,7 @@ namespace Playout_Manager
                             {
                                 label_current.Content = "NOW PLAYING: " + playItem.Name;
                                 PlayItem(playItem.Name, playItem.FrameIn, playItem.Framerate, playItem.EndAction, playItem.Duration, playItem.CG, playItem.CGlayer, playItem.CGdelay, playItem.CGfield0, playItem.CGfield1, playItem.Command);
-                                Log(playItem.Name + " has started playing at " + e.SignalTime, "info");
+
                             }
                         }
                     }
@@ -900,24 +911,34 @@ namespace Playout_Manager
                         {
                             //get the current row and turn it in to currentRow
                             DataGridRow currentRow = MainGrid.ItemContainerGenerator.ContainerFromItem(MainGrid.Items[index]) as DataGridRow;
-                            
+
                             //this if statement is here because sometimes currentRow can be null
                             if (currentRow != null)
                             {
                                 currentRow.Background = noBrush;
-                            }
 
-                            //if the item currently playing on the caspar server is the same as this item in the list
-                            if (currentMediaPath.Contains(playItem.Name))
-                            {
-                                //assign the item to our current item
-                                currentItem = playItem;
 
-                                //this still needs fixing
-                                if (currentRow != null) { 
-                                currentRow.Background = redBrush;
+
+                                if (playItem.CG != "0")
+                                {
+                                    currentRow.Background = dimorangeBrush;
                                 }
-                                //currentHasBeenFound = true;
+
+                                if (playItem.StartTime < DateTime.Now)
+                                {
+                                    currentRow.Background = dimredBrush;
+                                }
+
+
+
+                                //if the item currently playing on the caspar server is the same as this item in the list
+                                if (currentMediaPath.Contains(playItem.Name) && playItem.Name != "")
+                                {
+                                    //assign the item to our current item
+                                    currentItem = playItem;
+                                    currentRow.Background = redBrush;
+                                }
+
                             }
 
                             //increment the index
@@ -948,7 +969,7 @@ namespace Playout_Manager
                             timecode_next.Content = TimeSpan.FromSeconds(secsToEnd).ToString(@"hh\:mm\:ss");
 
 
-                            
+
 
                             if (secsToEnd < 5)
                             {
@@ -985,7 +1006,7 @@ namespace Playout_Manager
                         var st = new StackTrace(xmlerr, true);
                         var frame = st.GetFrame(0);
                         var line = frame.GetFileLineNumber();
-                        Log("Error at line "+line+":Couldn't get server data because " + xmlerr.Message, "warning");
+                        Log("Error at line " + line + ":Couldn't get server data because " + xmlerr.Message, "warning");
                     }
 
 
@@ -1298,7 +1319,7 @@ namespace Playout_Manager
         private void about_licence_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://github.com/tdoukinitsas/Playout-Manager/blob/master/LICENSE");
-        
+
         }
 
         private void about_feedback_Click(object sender, RoutedEventArgs e)
@@ -1309,6 +1330,118 @@ namespace Playout_Manager
         private void about_developer_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://www.doukinitsas.info");
+        }
+
+        private void cgStop_Click(object sender, RoutedEventArgs e)
+        {
+            int cgChannel = GetChannel("cg");
+            int cgLayer = Convert.ToInt32(cgToolbar_layer.Text);
+            _Caspar.CG_Stop(cgChannel, cgLayer);
+        }
+
+        private void cgUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            int cgChannel = GetChannel("cg");
+            int cgLayer = Convert.ToInt32(cgToolbar_layer.Text);
+            string f0 = cgToolbar_f0.Text;
+            string f1 = cgToolbar_f1.Text;
+
+            //copied and pasted code from edit page
+            Template previewTemplate = new CasparObjects.Template();
+            previewTemplate.AddField("f0", f0);
+            previewTemplate.AddField("f1", f1);
+            previewTemplate.UseJSON = true;
+            _Caspar.CG_Update(cgChannel, cgLayer, previewTemplate);
+
+            Log("Updated CG with new text data", "info");
+        }
+
+        private void cgUpdateWithSelected_Click(object sender, RoutedEventArgs e)
+        {
+
+            int index = 0;
+
+            foreach (var item in MainGrid.Items.OfType<DataItem>())
+            {
+                if (index == MainGrid.SelectedIndex)
+                {
+
+                    int cgChannel = GetChannel("cg");
+                    int cgLayer = item.CGlayer;
+                    string f0 = item.CGfield0;
+                    string f1 = item.CGfield1;
+
+                    //copied and pasted code from edit page
+                    Template previewTemplate = new CasparObjects.Template();
+                    previewTemplate.AddField("f0", f0);
+                    previewTemplate.AddField("f1", f1);
+                    previewTemplate.UseJSON = true;
+                    _Caspar.CG_Update(cgChannel, cgLayer, previewTemplate);
+
+                    Log("Updated CG with new text data", "info");
+
+
+
+                }
+
+                else
+                {
+
+                }
+
+                index = index + 1;
+            }
+
+
+
+        }
+
+
+
+        internal static class MediaColor
+        {
+            public static Color FromHex(string hex)
+            {
+                return (Color)ColorConverter.ConvertFromString(hex);
+            }
+        }
+
+        private static Theme LightTheme { get; } = Theme.Create(
+            new MaterialDesignLightTheme(),
+            MediaColor.FromHex("#FF9800"),
+            MediaColor.FromHex("#FF9800")
+        );
+
+        private static Theme DarkTheme { get; } = Theme.Create(
+            new MaterialDesignDarkTheme(),
+            MediaColor.FromHex("#FF9800"),
+            MediaColor.FromHex("#FF9800")
+        );
+
+        private void lightTheme_Click(object sender, RoutedEventArgs e)
+        {
+            var paletteHelper = new PaletteHelper();
+            paletteHelper.SetTheme(LightTheme);
+        }
+
+        private void darkTheme_Click(object sender, RoutedEventArgs e)
+        {
+            var paletteHelper = new PaletteHelper();
+            paletteHelper.SetTheme(DarkTheme);
+        }
+
+        void QuitAppConfirm(object sender, CancelEventArgs e)
+        {
+            if (_Caspar.Connected == true)
+            {
+                MessageBoxResult result = MessageBox.Show("CasparCG is still connected, do you really want to quit?",
+                "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
+            
         }
     }
 }
