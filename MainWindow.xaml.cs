@@ -501,12 +501,14 @@ namespace Playout_Manager
 
         private void SendPlayCommand(object sender, RoutedEventArgs e)
         {
-            _Caspar.Execute("PLAY 1-10");
+            int prevchannel = GetChannel("preview");
+            _Caspar.Execute("PLAY " + prevchannel + "-10");
         }
 
         private void SendPauseCommand(object sender, RoutedEventArgs e)
         {
-            _Caspar.Execute("PAUSE 1-10");
+            int prevchannel = GetChannel("preview");
+            _Caspar.Execute("PAUSE " + prevchannel + "-10");
         }
 
         private void MediaListChanged(object sender, EventArgs e)
@@ -677,6 +679,8 @@ namespace Playout_Manager
             string loopCommand = "";
             if (endaction == "loop") { loopCommand = " LOOP"; }
 
+            int playoutCh = GetChannel("playout");
+
             //check if there's media
             if (Name != "")
             {
@@ -688,9 +692,11 @@ namespace Playout_Manager
                 try
                 {
                     //Sends all our commands to CasparCG to play the media
-                    _Caspar.Execute("STOP 1-10");
-                    _Caspar.Execute("LOAD 1-10 \"" + Name + "\"" + loopCommand + " SEEK " + Convert.ToInt32((frameIn * frameRatio)) + " LENGTH " + Convert.ToInt32((duration * frameRatio)));
-                    _Caspar.Execute("PLAY 1-10");
+
+                    //The stop command has been commented out as it adds a black frame in between clips. There's still a black frame from the LOAD function
+                    //_Caspar.Execute("STOP " + playoutCh + "-10");
+                    _Caspar.Execute("LOAD " + playoutCh + "-10 \"" + Name + "\"" + loopCommand + " SEEK " + Convert.ToInt32((frameIn * frameRatio)) + " LENGTH " + Convert.ToInt32((duration * frameRatio)));
+                    _Caspar.Execute("PLAY " + playoutCh + "-10");
                     Log(Name + " has started playing", "info");
                 }
                 catch (Exception playErr)
